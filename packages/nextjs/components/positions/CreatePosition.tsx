@@ -49,7 +49,7 @@ export const CreatePosition = () => {
                 await writeYourContractAsync({
                   functionName: "createPosition",
                   value: parseEther(ethAmount.toString()),
-                  args: [BigInt(chance)],
+                  args: [0, BigInt(chance)],
                 });
               } catch (e) {
                 console.error("Error buying tokens:", e);

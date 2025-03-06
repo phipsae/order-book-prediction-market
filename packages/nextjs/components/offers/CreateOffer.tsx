@@ -65,8 +65,8 @@ export const CreateOffer = () => {
             onClick={async () => {
               try {
                 await writeYourContractAsync({
-                  functionName: "createOffer",
-                  args: [BigInt(chance), BigInt(parseEther(tokenAmount.toString()))],
+                  functionName: "createSellOffer",
+                  args: [0, BigInt(chance), BigInt(parseEther(tokenAmount.toString()))],
                 });
               } catch (e) {
                 console.error("Error buying tokens:", e);

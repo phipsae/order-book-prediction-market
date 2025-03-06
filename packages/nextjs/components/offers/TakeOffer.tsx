@@ -16,7 +16,7 @@ export const TakeOffer = ({ offerId, ethAmount, isActive }: TakeOfferProps) => {
   const handleTakeOffer = async () => {
     try {
       await writeContractAsync({
-        functionName: "takeOffer",
+        functionName: "takeSellOffer",
         args: [BigInt(offerId)],
         value: ethAmount,
       });

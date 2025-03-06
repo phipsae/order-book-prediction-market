@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     PredictionMarketOrderBook: {
-      address: "0x700b6a60ce7eaaea56f065753d8dcb9653dbad35",
+      address: "0xb19b36b1456e65e3a6d514d3f715f204bd59f431",
       abi: [
         {
           type: "constructor",
@@ -19,25 +19,6 @@ const deployedContracts = {
             },
           ],
           stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "OPTIONS",
-          inputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "string",
-              internalType: "string",
-            },
-          ],
-          stateMutability: "view",
         },
         {
           type: "function",
@@ -56,6 +37,25 @@ const deployedContracts = {
           type: "function",
           name: "QUESTION",
           inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "RESULTS",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
           outputs: [
             {
               name: "",
@@ -152,7 +152,7 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "closeOffer",
+          name: "closeBuyOffer",
           inputs: [
             {
               name: "_offerId",
@@ -178,8 +178,62 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "createOffer",
+          name: "closeSellOffer",
           inputs: [
+            {
+              name: "_offerId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "createBuyOffer",
+          inputs: [
+            {
+              name: "_result",
+              type: "uint8",
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
+            {
+              name: "_chance",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "payable",
+        },
+        {
+          type: "function",
+          name: "createPosition",
+          inputs: [
+            {
+              name: "_result",
+              type: "uint8",
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
+            {
+              name: "_chance",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "payable",
+        },
+        {
+          type: "function",
+          name: "createSellOffer",
+          inputs: [
+            {
+              name: "_result",
+              type: "uint8",
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
             {
               name: "_chance",
               type: "uint256",
@@ -193,19 +247,6 @@ const deployedContracts = {
           ],
           outputs: [],
           stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "createPosition",
-          inputs: [
-            {
-              name: "_chance",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [],
-          stateMutability: "payable",
         },
         {
           type: "function",
@@ -248,6 +289,25 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "noTokenBalance",
+          inputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "offers",
           inputs: [
             {
@@ -281,6 +341,21 @@ const deployedContracts = {
               name: "isActive",
               type: "bool",
               internalType: "bool",
+            },
+            {
+              name: "ethAmount",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "isBuyOffer",
+              type: "bool",
+              internalType: "bool",
+            },
+            {
+              name: "result",
+              type: "uint8",
+              internalType: "enum PredictionMarketOrderBook.Result",
             },
           ],
           stateMutability: "view",
@@ -343,6 +418,11 @@ const deployedContracts = {
               name: "isActive",
               type: "bool",
               internalType: "bool",
+            },
+            {
+              name: "result",
+              type: "uint8",
+              internalType: "enum PredictionMarketOrderBook.Result",
             },
           ],
           stateMutability: "view",
@@ -417,8 +497,34 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "redeemWinningTokens",
+          inputs: [
+            {
+              name: "_amount",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "renounceOwnership",
           inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "report",
+          inputs: [
+            {
+              name: "_winningOption",
+              type: "uint8",
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
+          ],
           outputs: [],
           stateMutability: "nonpayable",
         },
@@ -469,17 +575,30 @@ const deployedContracts = {
             {
               name: "",
               type: "address",
-              internalType: "address",
+              internalType: "contract PredictionOptionTokenOrderBook",
             },
           ],
           stateMutability: "view",
         },
         {
           type: "function",
-          name: "takeOffer",
+          name: "takeBuyOffer",
           inputs: [
             {
               name: "_offerId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "takePosition",
+          inputs: [
+            {
+              name: "_positionId",
               type: "uint256",
               internalType: "uint256",
             },
@@ -489,10 +608,10 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "takePosition",
+          name: "takeSellOffer",
           inputs: [
             {
-              name: "_positionId",
+              name: "_offerId",
               type: "uint256",
               internalType: "uint256",
             },
@@ -534,7 +653,7 @@ const deployedContracts = {
         },
         {
           type: "event",
-          name: "OfferClosed",
+          name: "BuyOfferClosed",
           inputs: [
             {
               name: "offerId",
@@ -553,13 +672,19 @@ const deployedContracts = {
         },
         {
           type: "event",
-          name: "OfferCreated",
+          name: "BuyOfferCreated",
           inputs: [
             {
               name: "offerId",
               type: "uint256",
               indexed: true,
               internalType: "uint256",
+            },
+            {
+              name: "result",
+              type: "uint8",
+              indexed: true,
+              internalType: "enum PredictionMarketOrderBook.Result",
             },
             {
               name: "creator",
@@ -579,12 +704,18 @@ const deployedContracts = {
               indexed: false,
               internalType: "uint256",
             },
+            {
+              name: "ethAmount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
           ],
           anonymous: false,
         },
         {
           type: "event",
-          name: "OfferTaken",
+          name: "BuyOfferTaken",
           inputs: [
             {
               name: "offerId",
@@ -593,19 +724,69 @@ const deployedContracts = {
               internalType: "uint256",
             },
             {
+              name: "result",
+              type: "uint8",
+              indexed: true,
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
+            {
               name: "chance",
               type: "uint256",
               indexed: true,
               internalType: "uint256",
             },
             {
-              name: "ethAmount",
+              name: "tokenAmount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+            {
+              name: "taker",
+              type: "address",
+              indexed: false,
+              internalType: "address",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "MarketReported",
+          inputs: [
+            {
+              name: "oracle",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "winningOption",
+              type: "uint8",
+              indexed: true,
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
+            {
+              name: "winningToken",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "OfferClosed",
+          inputs: [
+            {
+              name: "offerId",
               type: "uint256",
               indexed: true,
               internalType: "uint256",
             },
             {
-              name: "taker",
+              name: "closer",
               type: "address",
               indexed: false,
               internalType: "address",
@@ -662,6 +843,12 @@ const deployedContracts = {
               internalType: "uint256",
             },
             {
+              name: "result",
+              type: "uint8",
+              indexed: true,
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
+            {
               name: "creator",
               type: "address",
               indexed: false,
@@ -693,6 +880,12 @@ const deployedContracts = {
               internalType: "uint256",
             },
             {
+              name: "result",
+              type: "uint8",
+              indexed: true,
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
+            {
               name: "chance",
               type: "uint256",
               indexed: true,
@@ -701,7 +894,7 @@ const deployedContracts = {
             {
               name: "ethAmount",
               type: "uint256",
-              indexed: true,
+              indexed: false,
               internalType: "uint256",
             },
             {
@@ -709,6 +902,105 @@ const deployedContracts = {
               type: "address",
               indexed: false,
               internalType: "address",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "SellOfferCreated",
+          inputs: [
+            {
+              name: "offerId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "result",
+              type: "uint8",
+              indexed: true,
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
+            {
+              name: "creator",
+              type: "address",
+              indexed: false,
+              internalType: "address",
+            },
+            {
+              name: "chance",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "SellOfferTaken",
+          inputs: [
+            {
+              name: "offerId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "result",
+              type: "uint8",
+              indexed: true,
+              internalType: "enum PredictionMarketOrderBook.Result",
+            },
+            {
+              name: "chance",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "ethAmount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+            {
+              name: "taker",
+              type: "address",
+              indexed: false,
+              internalType: "address",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "WinningTokensRedeemed",
+          inputs: [
+            {
+              name: "redeemer",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+            {
+              name: "ethReceived",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
             },
           ],
           anonymous: false,
@@ -735,9 +1027,44 @@ const deployedContracts = {
             },
           ],
         },
+        {
+          type: "error",
+          name: "PredictionMarketOrderBook__AmountMustBeGreaterThanZero",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PredictionMarketOrderBook__ETHTransferFailed",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PredictionMarketOrderBook__InsufficientWinningTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PredictionMarketOrderBook__InvalidOption",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PredictionMarketOrderBook__OnlyOracleCanReport",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PredictionMarketOrderBook__PredictionAlreadyResolved",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PredictionMarketOrderBook__PredictionNotResolved",
+          inputs: [],
+        },
       ],
       inheritedFunctions: {},
-      deploymentFile: "run-1741247752.json",
+      deploymentFile: "run-1741271485.json",
       deploymentScript: "Deploy.s.sol",
     },
   },

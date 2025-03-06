@@ -16,7 +16,7 @@ export const CloseOffer = ({ offerId, isActive, isCreator }: CloseOfferProps) =>
   const handleTakePosition = async () => {
     try {
       await writeContractAsync({
-        functionName: "closeOffer",
+        functionName: "closeSellOffer",
         args: [BigInt(offerId)],
       });
     } catch (error) {

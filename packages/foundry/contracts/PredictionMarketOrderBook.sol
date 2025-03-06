@@ -139,7 +139,7 @@ contract PredictionMarketOrderBook is Ownable {
     /// Position functions /////////
     ////////////////////////////////
 
-    function createPosition(uint256 _chance, Result _result) public payable {
+    function createPosition(Result _result, uint256 _chance) public payable {
         require(_chance > 0 && _chance <= 100, "Probability must be between 1-100%");
         require(msg.value > 0, "Must send ETH to create offer");
 

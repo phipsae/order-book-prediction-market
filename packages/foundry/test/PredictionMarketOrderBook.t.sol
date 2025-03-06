@@ -22,7 +22,7 @@ contract PredictionMarketTest is Test {
 
     function test_createPosition() public {
         vm.prank(gambler1);
-        predictionMarket.createPosition{ value: 1 ether }(20, PredictionMarketOrderBook.Result.YES);
+        predictionMarket.createPosition{ value: 1 ether }(PredictionMarketOrderBook.Result.YES, 20);
 
         // // Get individual fields from the offer
         // (
@@ -59,7 +59,7 @@ contract PredictionMarketTest is Test {
 
     function test_createSellOffer() public {
         vm.prank(gambler1);
-        predictionMarket.createPosition{ value: 1 ether }(20, PredictionMarketOrderBook.Result.YES);
+        predictionMarket.createPosition{ value: 1 ether }(PredictionMarketOrderBook.Result.YES, 20);
 
         (
             uint256 id,
