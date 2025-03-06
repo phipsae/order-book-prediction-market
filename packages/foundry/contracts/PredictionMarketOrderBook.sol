@@ -29,7 +29,9 @@ contract PredictionMarketOrderBook is Ownable {
     uint256 public s_offerId = 0;
     bool public s_isReported;
     address public s_winningToken;
-    mapping(address => uint256) public yesTokenBalance;
+
+    mapping(address => uint256) public yesTokenBalance; // not sure if this is needed
+    mapping(address => uint256) public noTokenBalance; // not sure if this is needed
 
     struct Position {
         uint256 id;
@@ -39,6 +41,7 @@ contract PredictionMarketOrderBook is Ownable {
         uint256 matchingETHAmount;
         uint256 tokenAmount;
         bool isActive;
+        Result result;
     }
 
     struct Offer {
@@ -49,17 +52,35 @@ contract PredictionMarketOrderBook is Ownable {
         bool isActive;
         uint256 ethAmount;
         bool isBuyOffer;
+        Result result;
     }
 
     Position[] public positions;
     Offer[] public offers;
 
-    event PositionCreated(uint256 indexed offerId, address creator, uint256 chance, uint256 amount);
-    event PositionTaken(uint256 indexed offerId, uint256 indexed chance, uint256 indexed ethAmount, address taker);
-    event OfferCreated(uint256 indexed offerId, address creator, uint256 chance, uint256 amount);
-    event BuyOfferCreated(uint256 indexed offerId, address creator, uint256 chance, uint256 amount, uint256 ethAmount);
-    event OfferTaken(uint256 indexed offerId, uint256 indexed chance, uint256 indexed ethAmount, address taker);
-    event BuyOfferTaken(uint256 indexed offerId, uint256 indexed chance, uint256 indexed tokenAmount, address taker);
+    event PositionCreated(
+        uint256 indexed offerId, Result indexed result, address creator, uint256 chance, uint256 amount
+    );
+    event PositionTaken(
+        uint256 indexed offerId, Result indexed result, uint256 indexed chance, uint256 ethAmount, address taker
+    );
+    event SellOfferCreated(
+        uint256 indexed offerId, Result indexed result, address creator, uint256 chance, uint256 amount
+    );
+    event BuyOfferCreated(
+        uint256 indexed offerId,
+        Result indexed result,
+        address creator,
+        uint256 chance,
+        uint256 amount,
+        uint256 ethAmount
+    );
+    event SellOfferTaken(
+        uint256 indexed offerId, Result indexed result, uint256 indexed chance, uint256 ethAmount, address taker
+    );
+    event BuyOfferTaken(
+        uint256 indexed offerId, Result indexed result, uint256 indexed chance, uint256 tokenAmount, address taker
+    );
     event OfferClosed(uint256 indexed offerId, address closer);
     event BuyOfferClosed(uint256 indexed offerId, address closer);
     event PositionClosed(uint256 indexed positionId, address closer);
@@ -74,7 +95,7 @@ contract PredictionMarketOrderBook is Ownable {
     /// Position functions /////////
     ////////////////////////////////
 
-    function createPosition(uint256 _chance) public payable {
+    function createPosition(uint256 _chance, Result _result) public payable {
         require(_chance > 0 && _chance <= 100, "Probability must be between 1-100%");
         require(msg.value > 0, "Must send ETH to create offer");
 
@@ -90,11 +111,12 @@ contract PredictionMarketOrderBook is Ownable {
             ethAmount: msg.value,
             matchingETHAmount: matchingETHAmount,
             tokenAmount: tokenAmount,
-            isActive: true
+            isActive: true,
+            result: _result
         });
 
         positions.push(newPosition);
-        emit PositionCreated(s_positionId, msg.sender, _chance, msg.value);
+        emit PositionCreated(s_positionId, _result, msg.sender, _chance, msg.value);
         s_positionId++;
     }
 
@@ -103,13 +125,19 @@ contract PredictionMarketOrderBook is Ownable {
         Position storage position = positions[_positionId];
         require(position.isActive, "Position is not active");
         require(msg.value == position.matchingETHAmount, "Must match position amount");
+        Result result = position.result;
 
         // Mint tokens for both parties
-        i_yesToken.mint(position.creator, position.tokenAmount);
-        i_noToken.mint(msg.sender, position.tokenAmount);
+        if (result == Result.YES) {
+            i_yesToken.mint(position.creator, position.tokenAmount);
+            i_noToken.mint(msg.sender, position.tokenAmount);
+        } else {
+            i_noToken.mint(position.creator, position.tokenAmount);
+            i_yesToken.mint(msg.sender, position.tokenAmount);
+        }
 
         position.isActive = false;
-        emit PositionTaken(_positionId, position.chance, position.ethAmount, msg.sender);
+        emit PositionTaken(_positionId, result, position.chance, position.ethAmount, msg.sender);
     }
 
     function closePosition(uint256 _positionId) external {
@@ -128,7 +156,7 @@ contract PredictionMarketOrderBook is Ownable {
     /// Sell offer functions ////////
     ////////////////////////////////
 
-    function createSellOffer(uint256 _chance, uint256 tokenAmount) public {
+    function createSellOffer(Result _result, uint256 _chance, uint256 tokenAmount) public {
         require(_chance > 0 && _chance <= 100, "Probability must be between 1-100%");
         require(tokenAmount > 0, "Must send tokens to create offer");
 
@@ -139,13 +167,19 @@ contract PredictionMarketOrderBook is Ownable {
             tokenAmount: tokenAmount,
             isActive: true,
             ethAmount: 0,
-            isBuyOffer: false
+            isBuyOffer: false,
+            result: _result
         });
         offers.push(newOffer);
-        yesTokenBalance[msg.sender] += tokenAmount;
+        if (_result == Result.YES) {
+            yesTokenBalance[msg.sender] += tokenAmount;
+            i_yesToken.transferFrom(msg.sender, address(this), tokenAmount);
+        } else {
+            noTokenBalance[msg.sender] += tokenAmount;
+            i_noToken.transferFrom(msg.sender, address(this), tokenAmount);
+        }
 
-        i_yesToken.transferFrom(msg.sender, address(this), tokenAmount);
-        emit OfferCreated(s_offerId, msg.sender, _chance, tokenAmount);
+        emit SellOfferCreated(s_offerId, newOffer.result, msg.sender, _chance, tokenAmount);
         s_offerId++;
     }
 
@@ -154,13 +188,17 @@ contract PredictionMarketOrderBook is Ownable {
         Offer storage offer = offers[_offerId];
         require(offer.isActive, "Offer is not active");
         uint256 ethAmount = calculateEthValue(offer.chance, offer.tokenAmount);
-        console.log("ethAmount", ethAmount);
+        console.log("ethAmount from contract", ethAmount);
         require(msg.value == ethAmount, "Must match offer amount");
 
-        i_yesToken.transfer(msg.sender, offer.tokenAmount);
+        if (offer.result == Result.YES) {
+            i_yesToken.transfer(msg.sender, offer.tokenAmount);
+        } else {
+            i_noToken.transfer(msg.sender, offer.tokenAmount);
+        }
 
         offer.isActive = false;
-        emit OfferTaken(_offerId, offer.chance, ethAmount, msg.sender);
+        emit SellOfferTaken(_offerId, offer.result, offer.chance, ethAmount, msg.sender);
         (bool success,) = offer.creator.call{ value: msg.value }("");
         require(success, "ETH transfer failed");
     }
@@ -172,14 +210,18 @@ contract PredictionMarketOrderBook is Ownable {
         require(offer.creator == msg.sender, "Only creator can close offer");
         offer.isActive = false;
         emit OfferClosed(_offerId, msg.sender);
-        i_yesToken.transfer(offer.creator, offer.tokenAmount);
+        if (offer.result == Result.YES) {
+            i_yesToken.transfer(offer.creator, offer.tokenAmount);
+        } else {
+            i_noToken.transfer(offer.creator, offer.tokenAmount);
+        }
     }
 
     ////////////////////////////////
     /// Buy offer functions ///////////
     ////////////////////////////////
 
-    function createBuyOffer(uint256 _chance) public payable {
+    function createBuyOffer(Result _result, uint256 _chance) public payable {
         /// add some ether to the contract matching the token amount
         /// store the offer details
         require(_chance > 0 && _chance <= 100, "Probability must be between 1-100%");
@@ -195,11 +237,12 @@ contract PredictionMarketOrderBook is Ownable {
             tokenAmount: tokenAmount,
             isActive: true,
             ethAmount: msg.value,
-            isBuyOffer: true
+            isBuyOffer: true,
+            result: _result
         });
         offers.push(newOffer);
 
-        emit BuyOfferCreated(s_offerId, msg.sender, _chance, tokenAmount, msg.value);
+        emit BuyOfferCreated(s_offerId, newOffer.result, msg.sender, _chance, tokenAmount, msg.value);
         s_offerId++;
     }
 
@@ -209,18 +252,22 @@ contract PredictionMarketOrderBook is Ownable {
         require(offer.isActive, "Offer is not active");
         require(offer.isBuyOffer, "Offer is not a buy offer");
         uint256 tokenAmount = offer.tokenAmount;
-        uint256 tokenBalance = i_yesToken.balanceOf(msg.sender);
-        require(tokenBalance >= tokenAmount, "Insufficient balance");
-
-        // Transfer tokens from msg.sender to offer creator
-        i_yesToken.transferFrom(msg.sender, offer.creator, tokenAmount);
+        if (offer.result == Result.YES) {
+            uint256 tokenBalance = i_yesToken.balanceOf(msg.sender);
+            require(tokenBalance >= tokenAmount, "Insufficient balance");
+            i_yesToken.transferFrom(msg.sender, address(this), tokenAmount);
+        } else {
+            uint256 tokenBalance = i_noToken.balanceOf(msg.sender);
+            require(tokenBalance >= tokenAmount, "Insufficient balance");
+            i_noToken.transferFrom(msg.sender, address(this), tokenAmount);
+        }
 
         // Transfer ETH from contract to msg.sender in return
         (bool success,) = msg.sender.call{ value: offer.ethAmount }("");
         require(success, "ETH transfer failed");
 
         offer.isActive = false;
-        emit BuyOfferTaken(_offerId, offer.chance, offer.tokenAmount, msg.sender);
+        emit BuyOfferTaken(_offerId, offer.result, offer.chance, offer.tokenAmount, msg.sender);
     }
 
     function closeBuyOffer(uint256 _offerId) external {
@@ -230,7 +277,7 @@ contract PredictionMarketOrderBook is Ownable {
         require(offer.isBuyOffer, "Offer is not a buy offer");
         require(offer.creator == msg.sender, "Only creator can close offer");
         offer.isActive = false;
-        (bool success,) = msg.sender.call{ value: offer.ethAmount }("");
+        (bool success,) = offer.creator.call{ value: offer.ethAmount }("");
         require(success, "ETH transfer failed");
         emit BuyOfferClosed(_offerId, msg.sender);
     }

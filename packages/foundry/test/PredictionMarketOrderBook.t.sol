@@ -7,6 +7,7 @@ import { PredictionOptionTokenOrderBook } from "../contracts/PredictionOptionTok
 
 contract PredictionMarketTest is Test {
     PredictionMarketOrderBook public predictionMarket;
+
     address oracle = address(1);
     address gambler1 = address(2);
     address gambler2 = address(3);
@@ -21,7 +22,7 @@ contract PredictionMarketTest is Test {
 
     function test_createPosition() public {
         vm.prank(gambler1);
-        predictionMarket.createPosition{ value: 1 ether }(20);
+        predictionMarket.createPosition{ value: 1 ether }(20, PredictionMarketOrderBook.Result.YES);
 
         // // Get individual fields from the offer
         // (
@@ -45,7 +46,8 @@ contract PredictionMarketTest is Test {
             uint256 ethAmount,
             uint256 matchingETHAmount,
             uint256 tokenAmount,
-            bool isActive
+            bool isActive,
+            PredictionMarketOrderBook.Result result
         ) = predictionMarket.positions(0);
 
         vm.prank(gambler2);
@@ -57,7 +59,7 @@ contract PredictionMarketTest is Test {
 
     function test_createSellOffer() public {
         vm.prank(gambler1);
-        predictionMarket.createPosition{ value: 1 ether }(20);
+        predictionMarket.createPosition{ value: 1 ether }(20, PredictionMarketOrderBook.Result.YES);
 
         (
             uint256 id,
@@ -66,7 +68,8 @@ contract PredictionMarketTest is Test {
             uint256 ethAmount,
             uint256 matchingETHAmount,
             uint256 tokenAmount,
-            bool isActive
+            bool isActive,
+            PredictionMarketOrderBook.Result result
         ) = predictionMarket.positions(0);
 
         vm.prank(gambler2);
@@ -102,20 +105,30 @@ contract PredictionMarketTest is Test {
         console.log("ethAmount", ethAmount);
         console.log("ethAmountCalculated", ethAmountCalculated);
         vm.prank(gambler2);
-        predictionMarket.takeSellOffer{ value: ethAmount }(0);
+        predictionMarket.takeSellOffer{ value: ethAmountCalculated }(0);
 
         console.log("balanceOf(gambler2)", predictionMarket.i_yesToken().balanceOf(gambler2));
         // assertEq(predictionMarket.i_yesToken().balanceOf(gambler2), expectedBalanceOfGambler2AfterTakeOffer);
     }
 
     function test_closeSellOffer() public {
+        uint256 yesTokenBalanceBefore = predictionMarket.i_yesToken().balanceOf(gambler1);
+
         test_createSellOffer();
-        uint256 expectedBalanceOfGambler1AfterCloseOffer = 100 ether;
+        (
+            uint256 id,
+            address creator,
+            uint256 chance,
+            uint256 tokenAmount,
+            bool isActive,
+            uint256 ethAmount,
+            bool isBuyOffer
+        ) = predictionMarket.offers(0);
 
         vm.prank(gambler1);
         predictionMarket.closeSellOffer(0);
 
-        assertEq(predictionMarket.i_yesToken().balanceOf(gambler1), expectedBalanceOfGambler1AfterCloseOffer);
+        assertEq(predictionMarket.i_yesToken().balanceOf(gambler1), yesTokenBalanceBefore + tokenAmount);
     }
 
     function test_createBuyOffer() public {
