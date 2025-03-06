@@ -11,6 +11,22 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 contract PredictionMarketOrderBook is Ownable {
     using Strings for uint256;
 
+    /////////////////
+    /// Errors //////
+    /////////////////
+
+    error PredictionMarketOrderBook__PredictionAlreadyResolved();
+    error PredictionMarketOrderBook__InvalidOption();
+    error PredictionMarketOrderBook__OnlyOracleCanReport();
+    error PredictionMarketOrderBook__AmountMustBeGreaterThanZero();
+    error PredictionMarketOrderBook__PredictionNotResolved();
+    error PredictionMarketOrderBook__InsufficientWinningTokens();
+    error PredictionMarketOrderBook__ETHTransferFailed();
+
+    //////////////////////////
+    /// State Variables //////
+    //////////////////////////
+
     enum Result {
         YES,
         NO
@@ -28,7 +44,7 @@ contract PredictionMarketOrderBook is Ownable {
     uint256 public s_positionId = 0;
     uint256 public s_offerId = 0;
     bool public s_isReported;
-    address public s_winningToken;
+    PredictionOptionTokenOrderBook public s_winningToken;
 
     mapping(address => uint256) public yesTokenBalance; // not sure if this is needed
     mapping(address => uint256) public noTokenBalance; // not sure if this is needed
@@ -58,6 +74,10 @@ contract PredictionMarketOrderBook is Ownable {
     Position[] public positions;
     Offer[] public offers;
 
+    /////////////////////////
+    /// Evens ///
+    /////////////////////////
+
     event PositionCreated(
         uint256 indexed offerId, Result indexed result, address creator, uint256 chance, uint256 amount
     );
@@ -84,6 +104,30 @@ contract PredictionMarketOrderBook is Ownable {
     event OfferClosed(uint256 indexed offerId, address closer);
     event BuyOfferClosed(uint256 indexed offerId, address closer);
     event PositionClosed(uint256 indexed positionId, address closer);
+    event MarketReported(address indexed oracle, Result indexed winningOption, address indexed winningToken);
+    event WinningTokensRedeemed(address indexed redeemer, uint256 amount, uint256 ethReceived);
+
+    /////////////////
+    /// Modifiers ///
+    /////////////////
+
+    modifier onlyPredictionOpen() {
+        if (s_isReported) {
+            revert PredictionMarketOrderBook__PredictionAlreadyResolved();
+        }
+        _;
+    }
+
+    modifier withValidOption(Result _option) {
+        if (_option != Result.YES && _option != Result.NO) {
+            revert PredictionMarketOrderBook__InvalidOption();
+        }
+        _;
+    }
+
+    /////////////////
+    /// Functions ///
+    /////////////////
 
     constructor(address _oracle) Ownable(msg.sender) {
         i_yesToken = new PredictionOptionTokenOrderBook("Yes Token", "YES");
@@ -280,6 +324,56 @@ contract PredictionMarketOrderBook is Ownable {
         (bool success,) = offer.creator.call{ value: offer.ethAmount }("");
         require(success, "ETH transfer failed");
         emit BuyOfferClosed(_offerId, msg.sender);
+    }
+
+    /////////////////////////
+    /// Reporting functions ///
+    /////////////////////////
+
+    /**
+     * @notice Report the winning option for the prediction
+     * @param _winningOption The winning option (YES or NO)
+     */
+    function report(Result _winningOption) external onlyPredictionOpen withValidOption(_winningOption) {
+        if (msg.sender != i_oracle) {
+            revert PredictionMarketOrderBook__OnlyOracleCanReport();
+        }
+        // Set winning option
+        s_winningToken = _winningOption == Result.YES ? i_yesToken : i_noToken;
+        s_isReported = true;
+        emit MarketReported(msg.sender, _winningOption, address(s_winningToken));
+    }
+
+    /////////////////////////
+    /// Helper functions ///
+    /////////////////////////
+    /**
+     * @notice Redeem winning tokens for ETH after prediction is resolved, winning tokens are burned and user receives ETH
+     * @param _amount The amount of winning tokens to redeem
+     */
+    function redeemWinningTokens(uint256 _amount) external {
+        if (_amount == 0) {
+            revert PredictionMarketOrderBook__AmountMustBeGreaterThanZero();
+        }
+
+        if (!s_isReported) {
+            revert PredictionMarketOrderBook__PredictionNotResolved();
+        }
+
+        if (s_winningToken.balanceOf(msg.sender) <= _amount) {
+            revert PredictionMarketOrderBook__InsufficientWinningTokens();
+        }
+
+        uint256 ethToReceive = (_amount * TOKEN_VALUE) / PRECISION;
+
+        s_winningToken.burn(msg.sender, _amount);
+
+        (bool success,) = msg.sender.call{ value: ethToReceive }("");
+        if (!success) {
+            revert PredictionMarketOrderBook__ETHTransferFailed();
+        }
+
+        emit WinningTokensRedeemed(msg.sender, _amount, ethToReceive);
     }
 
     /////////////////////////

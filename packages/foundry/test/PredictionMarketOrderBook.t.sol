@@ -79,7 +79,7 @@ contract PredictionMarketTest is Test {
 
         vm.startPrank(gambler1);
         predictionMarket.i_yesToken().approve(address(predictionMarket), 500 ether);
-        predictionMarket.createSellOffer(20, 500 ether);
+        predictionMarket.createSellOffer(PredictionMarketOrderBook.Result.YES, 20, 500 ether);
         vm.stopPrank();
 
         console.log("balanceOf(gambler1)", predictionMarket.i_yesToken().balanceOf(gambler1));
@@ -97,7 +97,8 @@ contract PredictionMarketTest is Test {
             uint256 tokenAmount,
             bool isActive,
             uint256 ethAmount,
-            bool isBuyOffer
+            bool isBuyOffer,
+            PredictionMarketOrderBook.Result result
         ) = predictionMarket.offers(0);
         console.log("tokenAmount", tokenAmount);
 
@@ -122,7 +123,8 @@ contract PredictionMarketTest is Test {
             uint256 tokenAmount,
             bool isActive,
             uint256 ethAmount,
-            bool isBuyOffer
+            bool isBuyOffer,
+            PredictionMarketOrderBook.Result result
         ) = predictionMarket.offers(0);
 
         vm.prank(gambler1);
@@ -136,7 +138,7 @@ contract PredictionMarketTest is Test {
         uint256 initialPurchaseAmount = 1 ether;
 
         vm.prank(gambler2);
-        predictionMarket.createBuyOffer{ value: initialPurchaseAmount }(20);
+        predictionMarket.createBuyOffer{ value: initialPurchaseAmount }(PredictionMarketOrderBook.Result.YES, 20);
 
         (
             uint256 id,
@@ -145,7 +147,8 @@ contract PredictionMarketTest is Test {
             uint256 tokenAmount,
             bool isActive,
             uint256 ethAmount,
-            bool isBuyOffer
+            bool isBuyOffer,
+            PredictionMarketOrderBook.Result result
         ) = predictionMarket.offers(0);
 
         uint256 balanceAfter = address(gambler2).balance;
@@ -165,7 +168,8 @@ contract PredictionMarketTest is Test {
         uint256 yesTokenBalanceBeforeGambler1 = predictionMarket.i_yesToken().balanceOf(gambler1);
         uint256 noTokenBalanceBeforeGambler2 = predictionMarket.i_noToken().balanceOf(gambler2);
 
-        (,,, uint256 tokenAmount,,,) = predictionMarket.offers(0);
+        (,,, uint256 tokenAmount,,, bool isBuyOffer, PredictionMarketOrderBook.Result result) =
+            predictionMarket.offers(0);
 
         vm.startPrank(gambler1);
         predictionMarket.i_yesToken().approve(address(predictionMarket), tokenAmount);
