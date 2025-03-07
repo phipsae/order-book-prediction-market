@@ -130,6 +130,7 @@ export const Orderbook = ({ eventName, title }: OrderbookProps) => {
                         offerId={Number(offer.id)}
                         isActive={!eventName.includes("Taken")}
                         isCreator={address === offer.creator}
+                        isBuyOffer={eventName.includes("Sell")}
                       />
                     )}
                   </td>

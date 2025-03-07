@@ -1,8 +1,8 @@
 "use client";
 
 import { Address } from "../scaffold-eth";
-import { TakeOffer } from "./TakeOffer";
 import { CloseOffer } from "./close-offers/CloseOffer";
+import { TakeOffer } from "./take-offer/TakeOffer";
 import { formatEther } from "viem";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
@@ -47,7 +47,9 @@ export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer }: OfferC
   const ethAmount = (tokenAmount * tokenValue * chance) / (BigInt(100) * BigInt(10 ** 18));
 
   return (
-    <div className="card bg-base-100 shadow-sm p-4">
+    <div
+      className={`card bg-base-100 shadow-sm p-4 ${isBuyOffer ? "border-2 border-green-500" : "border-2 border-red-500"}`}
+    >
       <div className="flex flex-wrap gap-2 text-sm">
         <div className="flex items-center gap-2">
           <span className="text-base-content/70">ID:</span>
@@ -71,11 +73,14 @@ export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer }: OfferC
         <div className={`badge badge-sm ${offer[4] ? "badge-success" : "badge-error"}`}>
           {offer[4] ? "Active" : "Inactive"}
         </div>
-        <div className={`badge badge-sm ${offer[4] ? "badge-success" : "badge-error"}`}>
-          {isBuyOffer ? "Buy" : "Sell"}
-        </div>
-        <TakeOffer offerId={offerId} ethAmount={ethAmount} isActive={offer[4]} />
-        <CloseOffer offerId={offerId} isActive={offer[4]} isCreator={isCreator} />
+        <TakeOffer
+          offerId={offerId}
+          ethAmount={ethAmount}
+          isActive={offer[4]}
+          isBuyOffer={isBuyOffer}
+          tokenAmount={tokenAmount}
+        />
+        <CloseOffer offerId={offerId} isActive={offer[4]} isCreator={isCreator} isBuyOffer={isBuyOffer} />
       </div>
     </div>
   );

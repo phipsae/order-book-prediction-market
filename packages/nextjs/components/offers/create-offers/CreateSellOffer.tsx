@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GiveAllowance } from "../GiveAllowance";
-import { parseEther } from "viem";
+import { formatEther, parseEther } from "viem";
 import { EtherInput } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
@@ -23,6 +23,17 @@ export const CreateSellOffer = () => {
 
   const { data: deployedContractData } = useDeployedContractInfo({ contractName: "PredictionMarketOrderBook" });
   const contractAddress = deployedContractData?.address;
+
+  // Calculate ETH amount based on chance and token amount
+  const { data: ethAmount, refetch: refetchEthAmount } = useScaffoldReadContract({
+    contractName: "PredictionMarketOrderBook",
+    functionName: "calculateEthValue",
+    args: [BigInt(chance), parseEther(tokenAmount.toString())],
+  });
+
+  useEffect(() => {
+    refetchEthAmount();
+  }, [tokenAmount, chance, refetchEthAmount]);
 
   if (!prediction) return null;
 
@@ -63,6 +74,11 @@ export const CreateSellOffer = () => {
               placeholder="Enter ETH amount"
             />
           </div>
+          {ethAmount && (
+            <div className="alert alert-info">
+              <span>You will receive when offer gets taken: {formatEther(ethAmount)} ETH</span>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2">

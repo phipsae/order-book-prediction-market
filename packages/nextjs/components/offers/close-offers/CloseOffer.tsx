@@ -1,34 +1,21 @@
-"use client";
-
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { CloseBuyOffer } from "./CloseBuyOffer";
+import { CloseSellOffer } from "./CloseSellOffer";
 
 interface CloseOfferProps {
   offerId: number;
   isActive: boolean;
   isCreator: boolean;
+  isBuyOffer: boolean;
 }
 
-export const CloseOffer = ({ offerId, isActive, isCreator }: CloseOfferProps) => {
-  const { writeContractAsync } = useScaffoldWriteContract({
-    contractName: "PredictionMarketOrderBook",
-  });
-
-  const handleTakePosition = async () => {
-    try {
-      await writeContractAsync({
-        functionName: "closeSellOffer",
-        args: [BigInt(offerId)],
-      });
-    } catch (error) {
-      console.error("Error taking position:", error);
-    }
-  };
-
-  if (!isActive) return null;
-  if (!isCreator) return null;
+export const CloseOffer = ({ offerId, isActive, isCreator, isBuyOffer }: CloseOfferProps) => {
   return (
-    <button className="btn btn-xs btn-error text-error-content" onClick={handleTakePosition}>
-      Close Position
-    </button>
+    <div className="flex gap-2">
+      {!isBuyOffer ? (
+        <CloseSellOffer offerId={offerId} isActive={isActive} isCreator={isCreator} />
+      ) : (
+        <CloseBuyOffer offerId={offerId} isActive={isActive} isCreator={isCreator} />
+      )}
+    </div>
   );
 };

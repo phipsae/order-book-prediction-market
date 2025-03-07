@@ -11,6 +11,7 @@ export const CreateOffer = () => {
 
   const handleTabClick = (tab: "sell" | "buy", e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent event bubbling
     setActiveTab(tab);
   };
 
@@ -22,12 +23,14 @@ export const CreateOffer = () => {
 
           <div className="tabs tabs-boxed mb-4">
             <button
+              type="button"
               className={`tab ${activeTab === "sell" ? "tab-active" : ""}`}
               onClick={e => handleTabClick("sell", e)}
             >
               Sell Offer
             </button>
             <button
+              type="button"
               className={`tab ${activeTab === "buy" ? "tab-active" : ""}`}
               onClick={e => handleTabClick("buy", e)}
             >

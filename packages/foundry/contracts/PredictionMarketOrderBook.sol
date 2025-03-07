@@ -299,11 +299,11 @@ contract PredictionMarketOrderBook is Ownable {
         if (offer.result == Result.YES) {
             uint256 tokenBalance = i_yesToken.balanceOf(msg.sender);
             require(tokenBalance >= tokenAmount, "Insufficient balance");
-            i_yesToken.transferFrom(msg.sender, address(this), tokenAmount);
+            i_yesToken.transferFrom(msg.sender, offer.creator, tokenAmount);
         } else {
             uint256 tokenBalance = i_noToken.balanceOf(msg.sender);
             require(tokenBalance >= tokenAmount, "Insufficient balance");
-            i_noToken.transferFrom(msg.sender, address(this), tokenAmount);
+            i_noToken.transferFrom(msg.sender, offer.creator, tokenAmount);
         }
 
         // Transfer ETH from contract to msg.sender in return

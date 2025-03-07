@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OfferCard } from "./OfferCard";
 import { useAccount } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
@@ -12,6 +12,20 @@ export const OfferView = () => {
     contractName: "PredictionMarketOrderBook",
     functionName: "s_offerId",
   });
+
+  const [buyOffers, setBuyOffers] = useState<number[]>([]);
+  const [sellOffers, setSellOffers] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (!offerId) return;
+
+    // Create array of all offer IDs
+    const offerIds = Array.from({ length: Number(offerId) }, (_, i) => i);
+
+    // We'll sort them later when we have the chance data
+    setBuyOffers(offerIds);
+    setSellOffers(offerIds);
+  }, [offerId]);
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -31,12 +45,41 @@ export const OfferView = () => {
 
         {!offerId && "no offer found"}
 
-        {Array.from({ length: Number(offerId) }, (_, i) => {
-          if (activeTab === "active") {
-            return <OfferCard key={i} offerId={i} isActive={true} userAddress={address} isBuyOffer={true} />;
-          }
-          return <OfferCard key={i} offerId={i} isActive={false} userAddress={address} isBuyOffer={true} />;
-        })}
+        {offerId && offerId > 0 && (
+          <>
+            <div className="mb-6">
+              <h3 className="text-xl font-bold mb-3 text-green-500">Buy Offers</h3>
+              <div className="space-y-3">
+                {[...buyOffers]
+                  .sort((a, b) => a - b)
+                  .map(id => (
+                    <OfferCard
+                      key={`buy-${id}`}
+                      offerId={id}
+                      isActive={activeTab === "active"}
+                      userAddress={address}
+                      isBuyOffer={true}
+                    />
+                  ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-3 text-red-500">Sell Offers</h3>
+              <div className="space-y-3">
+                {sellOffers.map(id => (
+                  <OfferCard
+                    key={`sell-${id}`}
+                    offerId={id}
+                    isActive={activeTab === "active"}
+                    userAddress={address}
+                    isBuyOffer={false}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

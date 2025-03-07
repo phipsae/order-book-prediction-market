@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { parseEther } from "viem";
+import { formatEther, parseEther } from "viem";
 import { EtherInput } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
@@ -69,6 +69,11 @@ export const CreateBuyOffer = () => {
               placeholder="Enter ETH amount"
             />
           </div>
+          {ethAmount && (
+            <div className="alert alert-info">
+              <span>You will pay: {formatEther(ethAmount)} ETH</span>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2">

@@ -8,7 +8,7 @@ interface TakeOfferProps {
   isActive: boolean;
 }
 
-export const TakeOffer = ({ offerId, ethAmount, isActive }: TakeOfferProps) => {
+export const TakeSellOffer = ({ offerId, ethAmount, isActive }: TakeOfferProps) => {
   const { writeContractAsync } = useScaffoldWriteContract({
     contractName: "PredictionMarketOrderBook",
   });
