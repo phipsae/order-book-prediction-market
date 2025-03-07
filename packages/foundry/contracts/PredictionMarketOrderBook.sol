@@ -64,7 +64,8 @@ contract PredictionMarketOrderBook is Ownable {
         uint256 id;
         address creator;
         uint256 chance;
-        uint256 tokenAmount;
+        uint256 initialTokenAmount; //initial token amount, do I even need this? Maybe to calculate some probabilities?
+        uint256 outstandingTokenAmount; //token amount left to be taken
         bool isActive;
         uint256 ethAmount;
         bool isBuyOffer;
@@ -145,7 +146,6 @@ contract PredictionMarketOrderBook is Ownable {
 
         uint256 tokenAmount = calculateTokenAmount(_chance, msg.value);
         uint256 matchingETHAmount = calculateMatchingETHValue(_chance, tokenAmount);
-        console.log("matchingETHAmount", matchingETHAmount);
 
         // Store the offer details
         Position memory newPosition = Position({
@@ -200,15 +200,16 @@ contract PredictionMarketOrderBook is Ownable {
     /// Sell offer functions ////////
     ////////////////////////////////
 
-    function createSellOffer(Result _result, uint256 _chance, uint256 tokenAmount) public {
+    function createSellOffer(Result _result, uint256 _chance, uint256 initialTokenAmount) public {
         require(_chance > 0 && _chance <= 100, "Probability must be between 1-100%");
-        require(tokenAmount > 0, "Must send tokens to create offer");
+        require(initialTokenAmount > 0, "Must send tokens to create offer");
 
         Offer memory newOffer = Offer({
             id: s_offerId,
             creator: msg.sender,
             chance: _chance,
-            tokenAmount: tokenAmount,
+            initialTokenAmount: initialTokenAmount,
+            outstandingTokenAmount: initialTokenAmount,
             isActive: true,
             ethAmount: 0,
             isBuyOffer: false,
@@ -216,33 +217,37 @@ contract PredictionMarketOrderBook is Ownable {
         });
         offers.push(newOffer);
         if (_result == Result.YES) {
-            yesTokenBalance[msg.sender] += tokenAmount;
-            i_yesToken.transferFrom(msg.sender, address(this), tokenAmount);
+            yesTokenBalance[msg.sender] += initialTokenAmount;
+            i_yesToken.transferFrom(msg.sender, address(this), initialTokenAmount);
         } else {
-            noTokenBalance[msg.sender] += tokenAmount;
-            i_noToken.transferFrom(msg.sender, address(this), tokenAmount);
+            noTokenBalance[msg.sender] += initialTokenAmount;
+            i_noToken.transferFrom(msg.sender, address(this), initialTokenAmount);
         }
 
-        emit SellOfferCreated(s_offerId, newOffer.result, msg.sender, _chance, tokenAmount);
+        emit SellOfferCreated(s_offerId, newOffer.result, msg.sender, _chance, initialTokenAmount);
         s_offerId++;
     }
 
     function takeSellOffer(uint256 _offerId) external payable {
         require(_offerId < offers.length, "Offer does not exist");
+        require(msg.value > 0, "Must send ETH to take offer");
         Offer storage offer = offers[_offerId];
         require(offer.isActive, "Offer is not active");
-        uint256 ethAmount = calculateEthValue(offer.chance, offer.tokenAmount);
-        console.log("ethAmount from contract", ethAmount);
-        require(msg.value == ethAmount, "Must match offer amount");
+        /// calculate token amount to be taken
+        uint256 tokenAmount = calculateTokenAmount(offer.chance, msg.value);
+        require(tokenAmount <= offer.outstandingTokenAmount, "Insufficient outstanding token amount");
 
         if (offer.result == Result.YES) {
-            i_yesToken.transfer(msg.sender, offer.tokenAmount);
+            i_yesToken.transfer(msg.sender, tokenAmount);
         } else {
-            i_noToken.transfer(msg.sender, offer.tokenAmount);
+            i_noToken.transfer(msg.sender, tokenAmount);
         }
 
-        offer.isActive = false;
-        emit SellOfferTaken(_offerId, offer.result, offer.chance, ethAmount, msg.sender);
+        offer.outstandingTokenAmount -= tokenAmount;
+        if (offer.outstandingTokenAmount == 0) {
+            offer.isActive = false;
+        }
+        emit SellOfferTaken(_offerId, offer.result, offer.chance, msg.value, msg.sender);
         (bool success,) = offer.creator.call{ value: msg.value }("");
         require(success, "ETH transfer failed");
     }
@@ -253,11 +258,14 @@ contract PredictionMarketOrderBook is Ownable {
         require(offer.isActive, "Offer is not active");
         require(offer.creator == msg.sender, "Only creator can close offer");
         offer.isActive = false;
+        uint256 returnTokenAmount = offer.outstandingTokenAmount;
+        offer.outstandingTokenAmount = 0;
+
         emit OfferClosed(_offerId, msg.sender);
         if (offer.result == Result.YES) {
-            i_yesToken.transfer(offer.creator, offer.tokenAmount);
+            i_yesToken.transfer(offer.creator, returnTokenAmount);
         } else {
-            i_noToken.transfer(offer.creator, offer.tokenAmount);
+            i_noToken.transfer(offer.creator, returnTokenAmount);
         }
     }
 
@@ -270,15 +278,14 @@ contract PredictionMarketOrderBook is Ownable {
         /// store the offer details
         require(_chance > 0 && _chance <= 100, "Probability must be between 1-100%");
         require(msg.value > 0, "Must send ETH to create offer");
-        console.log("msg.value", msg.value);
-        console.log("msg.sender", msg.sender);
 
         uint256 tokenAmount = calculateTokenAmount(_chance, msg.value);
         Offer memory newOffer = Offer({
             id: s_offerId,
             creator: msg.sender,
             chance: _chance,
-            tokenAmount: tokenAmount,
+            initialTokenAmount: tokenAmount,
+            outstandingTokenAmount: tokenAmount,
             isActive: true,
             ethAmount: msg.value,
             isBuyOffer: true,
@@ -290,28 +297,31 @@ contract PredictionMarketOrderBook is Ownable {
         s_offerId++;
     }
 
-    function takeBuyOffer(uint256 _offerId) external {
+    function takeBuyOffer(uint256 _offerId, uint256 _tokenAmount) external {
         require(_offerId < offers.length, "Offer does not exist");
         Offer storage offer = offers[_offerId];
         require(offer.isActive, "Offer is not active");
         require(offer.isBuyOffer, "Offer is not a buy offer");
-        uint256 tokenAmount = offer.tokenAmount;
+        require(_tokenAmount <= offer.outstandingTokenAmount, "Insufficient outstanding token amount");
+        offer.outstandingTokenAmount -= _tokenAmount;
         if (offer.result == Result.YES) {
             uint256 tokenBalance = i_yesToken.balanceOf(msg.sender);
-            require(tokenBalance >= tokenAmount, "Insufficient balance");
-            i_yesToken.transferFrom(msg.sender, offer.creator, tokenAmount);
+            require(tokenBalance >= _tokenAmount, "Insufficient balance");
+            i_yesToken.transferFrom(msg.sender, offer.creator, _tokenAmount);
         } else {
             uint256 tokenBalance = i_noToken.balanceOf(msg.sender);
-            require(tokenBalance >= tokenAmount, "Insufficient balance");
-            i_noToken.transferFrom(msg.sender, offer.creator, tokenAmount);
+            require(tokenBalance >= _tokenAmount, "Insufficient balance");
+            i_noToken.transferFrom(msg.sender, offer.creator, _tokenAmount);
+        }
+        if (offer.outstandingTokenAmount == 0) {
+            offer.isActive = false;
         }
 
         // Transfer ETH from contract to msg.sender in return
         (bool success,) = msg.sender.call{ value: offer.ethAmount }("");
         require(success, "ETH transfer failed");
 
-        offer.isActive = false;
-        emit BuyOfferTaken(_offerId, offer.result, offer.chance, offer.tokenAmount, msg.sender);
+        emit BuyOfferTaken(_offerId, offer.result, offer.chance, _tokenAmount, msg.sender);
     }
 
     function closeBuyOffer(uint256 _offerId) external {
@@ -320,8 +330,10 @@ contract PredictionMarketOrderBook is Ownable {
         require(offer.isActive, "Offer is not active");
         require(offer.isBuyOffer, "Offer is not a buy offer");
         require(offer.creator == msg.sender, "Only creator can close offer");
+        uint256 ethAmount = calculateEthValue(offer.chance, offer.outstandingTokenAmount);
+        offer.outstandingTokenAmount = 0;
         offer.isActive = false;
-        (bool success,) = offer.creator.call{ value: offer.ethAmount }("");
+        (bool success,) = offer.creator.call{ value: ethAmount }("");
         require(success, "ETH transfer failed");
         emit BuyOfferClosed(_offerId, msg.sender);
     }
