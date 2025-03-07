@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
-import { CreateOffer } from "~~/components/offers/CreateOffer";
 import { OfferView } from "~~/components/offers/OfferView";
+import { CreateOffer } from "~~/components/offers/create-offers/CreateOffer";
 import { CreatePosition } from "~~/components/positions/CreatePosition";
 import { PositionView } from "~~/components/positions/PositionView";
 

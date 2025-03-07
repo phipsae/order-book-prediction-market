@@ -8,7 +8,7 @@ import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 export const OfferView = () => {
   const [activeTab, setActiveTab] = useState<"active" | "inactive">("active");
   const { address } = useAccount();
-  const { data: positionId, isLoading } = useScaffoldReadContract({
+  const { data: offerId, isLoading } = useScaffoldReadContract({
     contractName: "PredictionMarketOrderBook",
     functionName: "s_offerId",
   });
@@ -29,13 +29,13 @@ export const OfferView = () => {
           </a>
         </div>
 
-        {!positionId && "no position found"}
+        {!offerId && "no offer found"}
 
-        {Array.from({ length: Number(positionId) }, (_, i) => {
+        {Array.from({ length: Number(offerId) }, (_, i) => {
           if (activeTab === "active") {
-            return <OfferCard key={i} offerId={i} isActive={true} userAddress={address} />;
+            return <OfferCard key={i} offerId={i} isActive={true} userAddress={address} isBuyOffer={true} />;
           }
-          return <OfferCard key={i} offerId={i} isActive={false} userAddress={address} />;
+          return <OfferCard key={i} offerId={i} isActive={false} userAddress={address} isBuyOffer={true} />;
         })}
       </div>
     </div>

@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
-import { CreateOffer } from "~~/components/offers/CreateOffer";
 import { OfferView } from "~~/components/offers/OfferView";
 import { TokenBalance } from "~~/components/offers/TokenBalance";
+import { CreateOffer } from "~~/components/offers/create-offers/CreateOffer";
 import { PredictionMarketInfo } from "~~/components/prediction-market/PredictionMarketInfo";
 
 // import { OfferView } from "~~/components/offers/OfferView";

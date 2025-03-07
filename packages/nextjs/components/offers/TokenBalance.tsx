@@ -23,7 +23,7 @@ export function TokenBalance() {
     args: [address ?? "0x0"],
   });
 
-  const { data: balanceNoToken, queryKey: queryKeyNoToken } = useReadContract({
+  const { data: balanceNoToken } = useReadContract({
     abi: erc20Abi,
     address: prediction?.[9],
     functionName: "balanceOf",

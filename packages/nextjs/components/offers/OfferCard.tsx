@@ -1,8 +1,8 @@
 "use client";
 
 import { Address } from "../scaffold-eth";
-import { CloseOffer } from "./CloseOffer";
 import { TakeOffer } from "./TakeOffer";
+import { CloseOffer } from "./close-offers/CloseOffer";
 import { formatEther } from "viem";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
@@ -10,9 +10,10 @@ interface OfferCardProps {
   offerId: number;
   isActive: boolean;
   userAddress: string | undefined;
+  isBuyOffer: boolean;
 }
 
-export const OfferCard = ({ offerId, isActive, userAddress }: OfferCardProps) => {
+export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer }: OfferCardProps) => {
   const { data: offer, isLoading } = useScaffoldReadContract({
     contractName: "PredictionMarketOrderBook",
     functionName: "offers",
@@ -28,6 +29,7 @@ export const OfferCard = ({ offerId, isActive, userAddress }: OfferCardProps) =>
   if (!offer) return <div>No offer found...</div>;
   if (!prediction) return <div>No prediction found...</div>;
   if (isActive !== offer[4]) return null;
+  if (isBuyOffer !== offer[6]) return null;
   const isCreator = offer[1] === userAddress ? true : false;
 
   //   struct Offer {
@@ -68,6 +70,9 @@ export const OfferCard = ({ offerId, isActive, userAddress }: OfferCardProps) =>
 
         <div className={`badge badge-sm ${offer[4] ? "badge-success" : "badge-error"}`}>
           {offer[4] ? "Active" : "Inactive"}
+        </div>
+        <div className={`badge badge-sm ${offer[4] ? "badge-success" : "badge-error"}`}>
+          {isBuyOffer ? "Buy" : "Sell"}
         </div>
         <TakeOffer offerId={offerId} ethAmount={ethAmount} isActive={offer[4]} />
         <CloseOffer offerId={offerId} isActive={offer[4]} isCreator={isCreator} />
