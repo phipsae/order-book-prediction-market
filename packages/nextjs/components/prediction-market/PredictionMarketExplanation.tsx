@@ -9,8 +9,8 @@ export function PredictionMarketExplanation() {
         <div className="bg-base-200 p-4 rounded-lg">
           <h3 className="font-bold mb-2">What is a Prediction Market?</h3>
           <p>
-            A prediction market allows participants to bet on the outcome on a future event. They can buy and sell the
-            respective shares in which outcome they believe to. The market price reflects the collective probability
+            A prediction market allows participants to bet on the outcome on a future event. You can buy and sell the
+            respective shares in which outcome you believe in. The market price reflects the collective probability
             assessment of the event occurring.
           </p>
         </div>
