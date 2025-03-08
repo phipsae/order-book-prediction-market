@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { CreatePosition } from "~~/components/positions/CreatePosition";
 import { PositionView } from "~~/components/positions/PositionView";
-import { PostionsOverviewExplanation } from "~~/components/positions/PostionsOverviewExplanation";
+import { PositionsOverviewExplanation } from "~~/components/positions/PositionsOverviewExplanation";
 import { PredictionMarketInfo } from "~~/components/prediction-market/PredictionMarketInfo";
 
 const PositionsOverview: NextPage = () => {
@@ -16,7 +16,7 @@ const PositionsOverview: NextPage = () => {
 
         <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
           <div className="flex flex-col gap-4">
-            <PostionsOverviewExplanation />
+            <PositionsOverviewExplanation />
             <PredictionMarketInfo />
             <div className="flex gap-4 flex-wrap">
               <div className="flex-1 min-w-[300px]">
