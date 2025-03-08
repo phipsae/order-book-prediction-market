@@ -51,6 +51,8 @@ export function PredicitonMarketStats() {
     );
   }
 
+  const tokenValue = prediction[4];
+
   return (
     <div className="bg-base-100 p-6 rounded-lg shadow-lg max-w-2xl mx-auto mt-4">
       <h2 className="text-xl font-bold mb-4"> Prediciton Market Stats</h2>
@@ -61,10 +63,14 @@ export function PredicitonMarketStats() {
         <div className="divider my-2"></div>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span>ETH Balance:</span>
+            <span>Total ETH Balance:</span>
             <span className="font-medium">
               {contractBalance ? `${formatEther(contractBalance.value)} ${contractBalance.symbol}` : "Loading..."}
             </span>
+          </div>
+          <div className="flex justify-between">
+            <span> ETH Value of Token in case of winning:</span>
+            <span className="font-medium">{tokenValue ? `${formatEther(tokenValue)} ETH` : "Loading..."}</span>
           </div>
           <div className="flex justify-between">
             <span>Contract Address:</span>

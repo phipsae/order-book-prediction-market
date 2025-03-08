@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { PredicitonMarketStats } from "~~/components/prediction-market/PredicitonMarketStats";
+import { PredictionMarketExplanation } from "~~/components/prediction-market/PredictionMarketExplanation";
 import { PredictionMarketInfo } from "~~/components/prediction-market/PredictionMarketInfo";
 
 const PredictionMarket: NextPage = () => {
@@ -13,9 +14,16 @@ const PredictionMarket: NextPage = () => {
         </div>
 
         <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex flex-col gap-6">
-            <PredictionMarketInfo />
-            <PredicitonMarketStats />
+          <div className="flex flex-wrap gap-6">
+            <div className="flex-1 min-w-[300px]">
+              <PredictionMarketInfo />
+              <div className="mt-6">
+                <PredicitonMarketStats />
+              </div>
+            </div>
+            <div className="flex-1 min-w-[300px]">
+              <PredictionMarketExplanation />
+            </div>
           </div>
         </div>
       </div>
