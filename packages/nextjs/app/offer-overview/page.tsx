@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import { OfferTabs } from "~~/components/offers/OfferTabs";
-import { OfferView } from "~~/components/offers/OfferView";
 import { TokenBalance } from "~~/components/offers/TokenBalance";
 import { CreateOffer } from "~~/components/offers/create-offers/CreateOffer";
 import { PredictionMarketInfo } from "~~/components/prediction-market/PredictionMarketInfo";
@@ -18,20 +17,22 @@ const OfferOverview: NextPage = () => {
         </div>
 
         <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex gap-4 mb-4">
-            <div className="flex-1">
-              <PredictionMarketInfo />
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4 mb-4">
+              <div className="flex-1">
+                <PredictionMarketInfo />
+              </div>
+              <div className="flex-1">
+                <TokenBalance />
+              </div>
             </div>
-            <div className="flex-1">
-              <TokenBalance />
-            </div>
-          </div>
-          <div className="flex gap-4 flex-wrap">
-            <div className="flex-1 min-w-[300px]">
-              <OfferTabs />
-            </div>
-            <div className="flex-2 min-w-[300px]">
-              <CreateOffer />
+            <div className="flex gap-4 flex-wrap">
+              <div className="flex-1 min-w-[300px]">
+                <OfferTabs />
+              </div>
+              <div className="flex-2 min-w-[300px]">
+                <CreateOffer />
+              </div>
             </div>
           </div>
         </div>

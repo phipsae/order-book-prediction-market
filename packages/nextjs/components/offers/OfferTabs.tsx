@@ -20,14 +20,14 @@ export const OfferTabs = () => {
         <div className="tabs tabs-boxed mb-4">
           <button
             type="button"
-            className={`tab ${activeTab === "yes" ? "tab-active" : ""}`}
+            className={`tab ${activeTab === "yes" ? "tab-active !bg-emerald-500 !text-white" : "!text-emerald-600"}`}
             onClick={e => handleTabClick("yes", e)}
           >
             Yes Offers
           </button>
           <button
             type="button"
-            className={`tab ${activeTab === "no" ? "tab-active" : ""}`}
+            className={`tab ${activeTab === "no" ? "tab-active !bg-rose-600 !text-white" : "!text-rose-600"}`}
             onClick={e => handleTabClick("no", e)}
           >
             No Offers

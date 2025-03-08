@@ -17,8 +17,8 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
-    label: "Home",
-    href: "/",
+    label: "Overview",
+    href: "/prediction-market",
   },
 
   {
