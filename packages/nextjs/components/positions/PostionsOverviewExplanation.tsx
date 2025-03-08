@@ -1,7 +1,7 @@
 export function PostionsOverviewExplanation() {
   return (
     <div className="bg-base-100 p-6 rounded-lg shadow-lg max-w-2xl mx-auto mb-6">
-      <h2 className="text-2xl font-bold mb-4 text-center">Creating a Position</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">Creating and Taking a Position</h2>
 
       <div className="space-y-4 text-base-content">
         <p>
