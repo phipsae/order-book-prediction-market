@@ -16,7 +16,6 @@ const PredictionMarket: NextPage = () => {
 
         <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
           <PositionView />
-          <OfferView />
           <CreatePosition />
           <CreateOffer />
         </div>

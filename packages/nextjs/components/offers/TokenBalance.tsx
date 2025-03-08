@@ -56,28 +56,28 @@ export function TokenBalance() {
     <>
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
-          <div className="flex flex-row items-center gap-2">
-            <h3 className="text-lg text-center font-medium flex flex-col gap-1">
-              <div>
-                My Token Balance of &quot;Yes&quot;:{" "}
-                <span className="text-gray-700">{balanceYesToken ? formatEther(balanceYesToken) : "0"} tokens</span>
-              </div>
-              <div className="text-gray-700 text-sm">
-                ({tokenBalanceValueYesToken ? formatEther(tokenBalanceValueYesToken) : "0"} ETH worth in case of win)
-              </div>
-            </h3>
-          </div>
+          <h2 className="card-title text-2xl mb-4 text-center w-full">My Token Balances</h2>
 
-          <div className="flex flex-row items-center gap-2">
-            <h3 className="text-lg text-center font-medium flex flex-col gap-1">
-              <div>
-                My Token Balance of &quot;No&quot;:{" "}
-                <span className="text-gray-700">{balanceNoToken ? formatEther(balanceNoToken) : "0"} tokens</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200 shadow-sm">
+              <h3 className="text-lg font-semibold text-green-700 mb-2">Yes Tokens</h3>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold">{balanceYesToken ? formatEther(balanceYesToken) : "0"}</span>
+                <span className="text-sm text-green-600">
+                  Worth {tokenBalanceValueYesToken ? formatEther(tokenBalanceValueYesToken) : "0"} ETH if Yes wins
+                </span>
               </div>
-              <div className="text-gray-700 text-sm">
-                ({tokenBalanceValueNoToken ? formatEther(tokenBalanceValueNoToken) : "0"} ETH worth in case of win)
+            </div>
+
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200 shadow-sm">
+              <h3 className="text-lg font-semibold text-red-700 mb-2">No Tokens</h3>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold">{balanceNoToken ? formatEther(balanceNoToken) : "0"}</span>
+                <span className="text-sm text-red-600">
+                  Worth {tokenBalanceValueNoToken ? formatEther(tokenBalanceValueNoToken) : "0"} ETH if No wins
+                </span>
               </div>
-            </h3>
+            </div>
           </div>
         </div>
       </div>

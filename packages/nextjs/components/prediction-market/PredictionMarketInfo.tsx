@@ -58,7 +58,7 @@ export function PredictionMarketInfo() {
                 {isReported ? "Reported" : "In Progress"}
               </div>
             </div>
-            <ProbabilityDisplay label="Chance" isReported={isReported} winningOption={winningOption} />
+            {/* <ProbabilityDisplay label="Chance" isReported={isReported} winningOption={winningOption} /> */}
           </div>
         </div>
       </div>

@@ -29,7 +29,7 @@ export const PositionView = () => {
           </a>
         </div>
 
-        {!positionId && "no position found"}
+        {!positionId && "No positions found"}
 
         {Array.from({ length: Number(positionId) }, (_, i) => {
           if (activeTab === "active") {

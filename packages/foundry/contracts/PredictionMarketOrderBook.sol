@@ -32,7 +32,7 @@ contract PredictionMarketOrderBook is Ownable {
         NO
     }
 
-    string public constant QUESTION = "Is the price of ETH going to be above $10,000 in 30 days?";
+    string public constant QUESTION = "Is the price of ETH going to be above $10,000 by the end of 2025?";
     string[2] public RESULTS = ["Yes", "No"];
     uint256 public constant PRECISION = 1e18;
     uint256 public constant TOKEN_VALUE = 0.01 ether; // per token

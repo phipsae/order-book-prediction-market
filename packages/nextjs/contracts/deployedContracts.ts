@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     PredictionMarketOrderBook: {
-      address: "0x700b6a60ce7eaaea56f065753d8dcb9653dbad35",
+      address: "0xa15bb66138824a1c7167f5e85b957d04dd34e468",
       abi: [
         {
           type: "constructor",
@@ -240,7 +240,7 @@ const deployedContracts = {
               internalType: "uint256",
             },
             {
-              name: "tokenAmount",
+              name: "initialTokenAmount",
               type: "uint256",
               internalType: "uint256",
             },
@@ -333,7 +333,12 @@ const deployedContracts = {
               internalType: "uint256",
             },
             {
-              name: "tokenAmount",
+              name: "initialTokenAmount",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "outstandingTokenAmount",
               type: "uint256",
               internalType: "uint256",
             },
@@ -586,6 +591,11 @@ const deployedContracts = {
           inputs: [
             {
               name: "_offerId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_tokenAmount",
               type: "uint256",
               internalType: "uint256",
             },
@@ -1064,7 +1074,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deploymentFile: "run-1741347487.json",
+      deploymentFile: "run-1741354917.json",
       deploymentScript: "Deploy.s.sol",
     },
   },

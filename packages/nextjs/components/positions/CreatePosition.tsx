@@ -8,6 +8,7 @@ import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 export const CreatePosition = () => {
   const [chance, setChance] = useState(0);
   const [ethAmount, setEthAmount] = useState(0);
+  const [result, setResult] = useState<number>(0); // 0 for YES, 1 for NO
 
   const { writeContractAsync: writeYourContractAsync } = useScaffoldWriteContract({
     contractName: "PredictionMarketOrderBook",
@@ -19,6 +20,17 @@ export const CreatePosition = () => {
         <h2 className="card-title text-2xl mb-4">Create Position</h2>
 
         <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            <label className="text-sm font-medium mb-2">Expected Result</label>
+            <select
+              className="select select-bordered w-full"
+              value={result}
+              onChange={e => setResult(Number(e.target.value))}
+            >
+              <option value={0}>Yes</option>
+              <option value={1}>No</option>
+            </select>
+          </div>
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-2">Chance (1-100%)</label>
             <input
@@ -49,7 +61,7 @@ export const CreatePosition = () => {
                 await writeYourContractAsync({
                   functionName: "createPosition",
                   value: parseEther(ethAmount.toString()),
-                  args: [0, BigInt(chance)],
+                  args: [result, BigInt(chance)],
                 });
               } catch (e) {
                 console.error("Error buying tokens:", e);

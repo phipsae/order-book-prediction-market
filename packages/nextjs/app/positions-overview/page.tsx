@@ -16,9 +16,13 @@ const PositionsOverview: NextPage = () => {
         <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
           <div className="flex flex-col gap-4">
             <PredictionMarketInfo />
-            <PositionView />
-            <div className="max-w-2xl mx-auto w-full">
-              <CreatePosition />
+            <div className="flex gap-4 flex-wrap">
+              <div className="flex-1 min-w-[300px]">
+                <PositionView />
+              </div>
+              <div className="flex-2 min-w-[300px]">
+                <CreatePosition />
+              </div>
             </div>
           </div>
         </div>

@@ -10,7 +10,6 @@ interface TakeOfferProps {
 }
 
 export const TakeOffer = ({ offerId, ethAmount, isActive, isBuyOffer, tokenAmount }: TakeOfferProps) => {
-  console.log("tokenAmount", tokenAmount);
   return (
     <div>
       {isBuyOffer ? (

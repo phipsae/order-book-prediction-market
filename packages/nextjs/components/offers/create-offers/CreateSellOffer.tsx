@@ -83,7 +83,7 @@ export const CreateSellOffer = () => {
 
         <div className="flex gap-2">
           <GiveAllowance
-            tokenAddress={prediction[8] as string}
+            tokenAddress={selectedOption === 0 ? (prediction[8] as string) : (prediction[9] as string)}
             spenderAddress={contractAddress ?? ""}
             amount={tokenAmount.toString()}
             showInput={false}

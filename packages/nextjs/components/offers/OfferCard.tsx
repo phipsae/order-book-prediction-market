@@ -11,9 +11,10 @@ interface OfferCardProps {
   isActive: boolean;
   userAddress: string | undefined;
   isBuyOffer: boolean;
+  isYes: boolean;
 }
 
-export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer }: OfferCardProps) => {
+export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer, isYes }: OfferCardProps) => {
   const { data: offer, isLoading } = useScaffoldReadContract({
     contractName: "PredictionMarketOrderBook",
     functionName: "offers",
@@ -28,16 +29,23 @@ export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer }: OfferC
   if (isLoading) return <div>Loading...</div>;
   if (!offer) return <div>No offer found...</div>;
   if (!prediction) return <div>No prediction found...</div>;
-  if (isActive !== offer[4]) return null;
-  if (isBuyOffer !== offer[6]) return null;
+  if (isActive !== offer[5]) return null;
+  if (isBuyOffer !== offer[7]) return null;
+  // When result is 0 (YES) and isYes is true, or when result is 1 (NO) and isYes is false
+  const result = Number(offer[8]) === 0 ? true : false;
+  if (isYes !== result) return null;
   const isCreator = offer[1] === userAddress ? true : false;
 
   //   struct Offer {
   //     uint256 id;
   //     address creator;
   //     uint256 chance;
-  //     uint256 tokenAmount;
+  //     uint256 initialTokenAmount; //initial token amount, do I even need this? Maybe to calculate some probabilities?
+  //     uint256 outstandingTokenAmount; //token amount left to be taken
   //     bool isActive;
+  //     uint256 ethAmount;
+  //     bool isBuyOffer;
+  //     Result result;
   // }
 
   const chance = offer[2];
@@ -55,6 +63,12 @@ export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer }: OfferC
           <span className="text-base-content/70">ID:</span>
           <span>{offer[0].toString()}</span>
         </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-base-content/70">Result:</span>
+          <span>{offer[8] ? "No" : "Yes"}</span>
+        </div>
+
         <div className="flex items-center gap-2">
           <span className="text-base-content/70">Creator:</span>
           <span className="truncate max-w-[100px]">
@@ -66,21 +80,21 @@ export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer }: OfferC
           <span>{Number(offer[2])}%</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-base-content/70">Token Amount:</span>
-          <span>{Number(formatEther(offer[3])).toFixed(4)}</span>
+          <span className="text-base-content/70">Available Token Amount:</span>
+          <span>{Number(formatEther(offer[4])).toFixed(4)}</span>
         </div>
 
         <div className={`badge badge-sm ${offer[4] ? "badge-success" : "badge-error"}`}>
-          {offer[4] ? "Active" : "Inactive"}
+          {offer[4] ? "Active" : "Closed"}
         </div>
         <TakeOffer
           offerId={offerId}
           ethAmount={ethAmount}
-          isActive={offer[4]}
+          isActive={offer[5]}
           isBuyOffer={isBuyOffer}
           tokenAmount={tokenAmount}
         />
-        <CloseOffer offerId={offerId} isActive={offer[4]} isCreator={isCreator} isBuyOffer={isBuyOffer} />
+        <CloseOffer offerId={offerId} isActive={offer[5]} isCreator={isCreator} isBuyOffer={isBuyOffer} />
       </div>
     </div>
   );
