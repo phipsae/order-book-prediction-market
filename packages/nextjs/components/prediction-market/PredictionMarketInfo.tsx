@@ -48,18 +48,18 @@ export function PredictionMarketInfo() {
   const winningOption = winningToken === yesTokenAddress ? predictionOutcome1 : predictionOutcome2;
 
   return (
-    <div className="bg-base-100 p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
-      <div className="space-y-6">
-        <div className="bg-base-200 p-4 rounded-lg">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-base-content text-xl font-bold">{question}</p>
+    <div className="bg-base-100 p-6 rounded-lg shadow-lg max-w-2xl mx-auto flex-grow h-full">
+      <div className="bg-base-200 p-4 rounded-lg h-full border border-base-300">
+        <div className="flex justify-center items-center h-full">
+          <div>
+            <p className="text-base-content text-xl font-bold text-center">{question}</p>
+            <div className="flex justify-center mt-2">
               <div className={`badge ${isReported ? "badge-success" : "badge-warning"}`}>
                 {isReported ? "Reported" : "In Progress"}
               </div>
             </div>
-            {/* <ProbabilityDisplay label="Chance" isReported={isReported} winningOption={winningOption} /> */}
           </div>
+          {/* <ProbabilityDisplay label="Chance" isReported={isReported} winningOption={winningOption} /> */}
         </div>
       </div>
     </div>

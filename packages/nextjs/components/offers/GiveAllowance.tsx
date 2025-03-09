@@ -2,56 +2,61 @@
 
 import { useState } from "react";
 import { parseEther } from "viem";
-import { useWriteContract } from "wagmi";
+import { usePublicClient, useWriteContract } from "wagmi";
 import { erc20Abi } from "~~/components/constants";
 import { notification } from "~~/utils/scaffold-eth";
 
 export function GiveAllowance({
   tokenAddress,
   spenderAddress,
-  amount = "0",
-  showInput = true,
+  amount,
+  onApprovalStatusChange,
 }: {
   tokenAddress: string;
   spenderAddress: string;
-  amount?: string;
-  showInput?: boolean;
+  amount: string;
+  onApprovalStatusChange?: (isApproved: boolean) => void;
 }) {
-  const [inputAmount, setInputAmount] = useState<string>("");
-
   const { writeContractAsync: approveToken } = useWriteContract();
+  const publicClient = usePublicClient();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
 
   const handleApprove = async () => {
     try {
-      await approveToken({
+      setIsLoading(true);
+
+      const hash = await approveToken({
         abi: erc20Abi,
-        address: tokenAddress,
+        address: tokenAddress as `0x${string}`,
         functionName: "approve",
-        args: [spenderAddress, parseEther(showInput ? inputAmount || "0" : amount)],
+        args: [spenderAddress as `0x${string}`, parseEther(amount || "0")],
       });
-      notification.success("Tokens approved successfully");
+
+      // Wait for transaction confirmation
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+
+      if (receipt?.status === "success") {
+        notification.success("Tokens approved successfully");
+        setIsApproved(true);
+        if (onApprovalStatusChange) {
+          onApprovalStatusChange(true);
+        }
+      }
+      setIsLoading(false);
     } catch (error) {
       console.error("Error approving tokens:", error);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className={showInput ? "space-y-2" : ""}>
-      {showInput && (
-        <input
-          type="number"
-          placeholder="Amount to approve"
-          className="input input-bordered input-sm w-full border-gray-300 focus:border-gray-500"
-          value={inputAmount}
-          onChange={e => setInputAmount(e.target.value)}
-        />
-      )}
-      <button
-        className={`btn btn-sm ${showInput ? "w-full" : "flex-1"} bg-gray-600 hover:bg-gray-700 text-white`}
-        onClick={handleApprove}
-      >
-        Approve
-      </button>
-    </div>
+    <button
+      className={`btn ${isApproved ? "bg-green-600 hover:bg-green-700" : "bg-gray-600 hover:bg-gray-700"} text-white ${isLoading ? "loading loading-xxs" : ""}`}
+      onClick={handleApprove}
+      disabled={isLoading || isApproved}
+    >
+      {isLoading ? "..." : isApproved ? "Approved" : "Approve"}
+    </button>
   );
 }

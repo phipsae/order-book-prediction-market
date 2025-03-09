@@ -1,4 +1,5 @@
 import type { NextPage } from "next";
+import { TokenBalance } from "~~/components/offers/TokenBalance";
 import { PredicitonMarketStats } from "~~/components/prediction-market/PredicitonMarketStats";
 import { PredictionMarketExplanation } from "~~/components/prediction-market/PredictionMarketExplanation";
 import { PredictionMarketInfo } from "~~/components/prediction-market/PredictionMarketInfo";
@@ -14,14 +15,24 @@ const PredictionMarket: NextPage = () => {
         </div>
 
         <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex flex-wrap gap-6">
-            <div className="flex-1 min-w-[300px]">
-              <PredictionMarketInfo />
-              <div className="mt-6">
-                <PredicitonMarketStats />
+          <div className="flex gap-6 max-w-[1400px] mx-auto">
+            <div className="flex-grow flex flex-col gap-4 max-w-[900px]">
+              <div className="flex gap-4 mb-4">
+                <div className="flex-1 flex flex-col flex-grow">
+                  <PredictionMarketInfo />
+                </div>
+                <div className="flex-1">
+                  <TokenBalance />
+                </div>
+              </div>
+              <div className="flex flex-col gap-4">
+                <div className="w-full">
+                  <PredicitonMarketStats />
+                </div>
               </div>
             </div>
-            <div className="flex-1 min-w-[300px]">
+
+            <div className="w-1/3 min-w-[300px] max-w-[450px]">
               <PredictionMarketExplanation />
             </div>
           </div>

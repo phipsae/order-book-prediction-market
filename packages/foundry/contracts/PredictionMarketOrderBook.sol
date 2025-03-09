@@ -8,6 +8,7 @@ import { console } from "forge-std/console.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 // TODO: ONLY FOR YES TOKEN RIGHT NOW!
+// TODO: integrate withdrawa function
 contract PredictionMarketOrderBook is Ownable {
     using Strings for uint256;
 

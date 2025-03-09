@@ -54,7 +54,7 @@ export function TokenBalance() {
 
   return (
     <>
-      <div className="card bg-base-100 shadow-xl">
+      <div className="bg-base-100 rounded-lg shadow-lg max-w-2xl mx-auto">
         <div className="card-body">
           <h2 className="card-title text-2xl mb-4 text-center w-full">My Token Balances</h2>
 
@@ -62,9 +62,12 @@ export function TokenBalance() {
             <div className="bg-green-50 p-4 rounded-lg border border-green-200 shadow-sm">
               <h3 className="text-lg font-semibold text-green-700 mb-2">Yes Tokens</h3>
               <div className="flex flex-col">
-                <span className="text-xl font-bold">{balanceYesToken ? formatEther(balanceYesToken) : "0"}</span>
+                <span className="text-xl font-bold">
+                  {balanceYesToken ? Number(formatEther(balanceYesToken)).toFixed(4) : "0"}
+                </span>
                 <span className="text-sm text-green-600">
-                  Worth {tokenBalanceValueYesToken ? formatEther(tokenBalanceValueYesToken) : "0"} ETH if Yes wins
+                  Worth {tokenBalanceValueYesToken ? Number(formatEther(tokenBalanceValueYesToken)).toFixed(4) : "0"}{" "}
+                  ETH if Yes wins
                 </span>
               </div>
             </div>
@@ -72,9 +75,12 @@ export function TokenBalance() {
             <div className="bg-red-50 p-4 rounded-lg border border-red-200 shadow-sm">
               <h3 className="text-lg font-semibold text-red-700 mb-2">No Tokens</h3>
               <div className="flex flex-col">
-                <span className="text-xl font-bold">{balanceNoToken ? formatEther(balanceNoToken) : "0"}</span>
+                <span className="text-xl font-bold">
+                  {balanceNoToken ? Number(formatEther(balanceNoToken)).toFixed(4) : "0"}
+                </span>
                 <span className="text-sm text-red-600">
-                  Worth {tokenBalanceValueNoToken ? formatEther(tokenBalanceValueNoToken) : "0"} ETH if No wins
+                  Worth {tokenBalanceValueNoToken ? Number(formatEther(tokenBalanceValueNoToken)).toFixed(4) : "0"} ETH
+                  if No wins
                 </span>
               </div>
             </div>

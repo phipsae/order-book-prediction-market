@@ -8,9 +8,10 @@ import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaf
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
 export const CreateSellOffer = () => {
-  const [chance, setChance] = useState(0);
-  const [tokenAmount, setTokenAmount] = useState<bigint>(BigInt(0));
+  const [chance, setChance] = useState<string>("");
+  const [tokenAmount, setTokenAmount] = useState<string>("0");
   const [selectedOption, setSelectedOption] = useState<number>(0); // 0 for YES, 1 for NO
+  const [isApproved, setIsApproved] = useState(false);
 
   const { writeContractAsync: writeYourContractAsync } = useScaffoldWriteContract({
     contractName: "PredictionMarketOrderBook",
@@ -28,12 +29,17 @@ export const CreateSellOffer = () => {
   const { data: ethAmount, refetch: refetchEthAmount } = useScaffoldReadContract({
     contractName: "PredictionMarketOrderBook",
     functionName: "calculateEthValue",
-    args: [BigInt(chance), parseEther(tokenAmount.toString())],
+    args: [BigInt(chance || "0"), parseEther(tokenAmount || "0")],
   });
 
   useEffect(() => {
     refetchEthAmount();
   }, [tokenAmount, chance, refetchEthAmount]);
+
+  // Handle approval status change from GiveAllowance
+  const handleApprovalStatusChange = (approved: boolean) => {
+    setIsApproved(approved);
+  };
 
   if (!prediction) return null;
 
@@ -60,18 +66,25 @@ export const CreateSellOffer = () => {
               type="number"
               min="1"
               max="100"
+              step="1"
               className="input input-bordered"
               placeholder="Enter chance percentage"
               value={chance}
-              onChange={e => setChance(Number(e.target.value))}
+              onChange={e => {
+                const value = e.target.value;
+                // Allow empty value or integers between 1-100
+                if (value === "" || (parseInt(value) === Number(value) && Number(value) >= 1 && Number(value) <= 100)) {
+                  setChance(value);
+                }
+              }}
             />
           </div>
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-2">&quot;Yes&quot; Token Amount</label>
             <EtherInput
-              value={tokenAmount.toString()}
-              onChange={(value: string) => setTokenAmount(BigInt(value))}
-              placeholder="Enter ETH amount"
+              value={tokenAmount}
+              onChange={(value: string) => setTokenAmount(value)}
+              placeholder="Enter token amount"
             />
           </div>
           {ethAmount && (
@@ -85,23 +98,30 @@ export const CreateSellOffer = () => {
           <GiveAllowance
             tokenAddress={selectedOption === 0 ? (prediction[8] as string) : (prediction[9] as string)}
             spenderAddress={contractAddress ?? ""}
-            amount={tokenAmount.toString()}
-            showInput={false}
+            amount={tokenAmount}
+            onApprovalStatusChange={handleApprovalStatusChange}
           />
           <button
             className="btn btn-primary"
             onClick={async () => {
               try {
+                // Validate chance is not empty
+                if (!chance) {
+                  alert("Please enter a chance percentage");
+                  return;
+                }
+
                 await writeYourContractAsync({
                   functionName: "createSellOffer",
-                  args: [selectedOption, BigInt(chance), BigInt(parseEther(tokenAmount.toString()))],
+                  args: [selectedOption, BigInt(parseInt(chance)), parseEther(tokenAmount || "0")],
                 });
               } catch (e) {
                 console.error("Error buying tokens:", e);
               }
             }}
+            disabled={!chance || parseEther(tokenAmount || "0") <= 0n || !isApproved}
           >
-            Create Sell Offer
+            Create
           </button>
         </div>
       </div>

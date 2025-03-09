@@ -6,7 +6,7 @@ import { EtherInput } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 export const CreateBuyOffer = () => {
-  const [chance, setChance] = useState(0);
+  const [chance, setChance] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<bigint>(BigInt(0));
   const [selectedOption, setSelectedOption] = useState<number>(0); // 0 for YES, 1 for NO
 
@@ -55,10 +55,17 @@ export const CreateBuyOffer = () => {
               type="number"
               min="1"
               max="100"
+              step="1"
               className="input input-bordered"
               placeholder="Enter chance percentage"
               value={chance}
-              onChange={e => setChance(Number(e.target.value))}
+              onChange={e => {
+                const value = e.target.value;
+                // Allow empty value or integers between 1-100
+                if (value === "" || (parseInt(value) === Number(value) && Number(value) >= 1 && Number(value) <= 100)) {
+                  setChance(value);
+                }
+              }}
             />
           </div>
           <div className="flex flex-col">
@@ -91,7 +98,7 @@ export const CreateBuyOffer = () => {
               }
             }}
           >
-            Create Buy Offer
+            Create
           </button>
         </div>
       </div>

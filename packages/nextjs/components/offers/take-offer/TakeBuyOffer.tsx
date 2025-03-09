@@ -50,6 +50,8 @@ export const TakeBuyOffer = ({ offerId, ethAmount, isActive, tokenAmount }: Take
         functionName: "takeBuyOffer",
         args: [BigInt(offerId), parseEther(buyAmount)],
       });
+
+      setBuyAmount("0");
     } catch (error) {
       console.error("Error taking position:", error);
     }
@@ -97,13 +99,8 @@ export const TakeBuyOffer = ({ offerId, ethAmount, isActive, tokenAmount }: Take
             tokenAddress={isYesToken ? (prediction[8] as string) : (prediction[9] as string)}
             spenderAddress={contractAddress ?? ""}
             amount={buyAmount}
-            showInput={false}
           />
-          <button
-            className="btn btn-xs btn-primary"
-            onClick={handleTakeOffer}
-            disabled={parseEther(buyAmount || "0") <= 0n}
-          >
+          <button className="btn btn-primary" onClick={handleTakeOffer} disabled={parseEther(buyAmount || "0") <= 0n}>
             Sell {tokenType} Token
           </button>
         </div>

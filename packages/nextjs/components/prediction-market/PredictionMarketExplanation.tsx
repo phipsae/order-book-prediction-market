@@ -4,36 +4,62 @@ export function PredictionMarketExplanation() {
       <h2 className="text-2xl font-bold mb-4 text-center">How This Prediction Market Works</h2>
 
       <div className="space-y-4 text-base-content">
-        <p>This is an order-book based prediction market where trades gets settled only with a counterparty</p>
+        <p>
+          This is an order-book-based prediction market, where trades are settled exclusively when matched with a
+          counterparty.
+        </p>
 
         <div className="bg-base-200 p-4 rounded-lg">
           <h3 className="font-bold mb-2">What is a Prediction Market?</h3>
           <p>
-            A prediction market allows participants to bet on the outcome on a future event. You can buy and sell the
-            respective shares in which outcome you believe in. The market price reflects the collective probability
-            assessment of the event occurring.
+            A prediction market allows participants to bet on the outcomes of future events by buying and selling shares
+            based on their expectations. The market price of these shares reflects the collective estimate of the
+            likelihood that an event will occur.
           </p>
         </div>
 
         <div className="bg-base-200 p-4 rounded-lg">
           <h3 className="font-bold mb-2">How it works:</h3>
+          <ul className="list-decimal list-inside space-y-2">
+            <p>There are two ways to participate in the prediction market:</p>
+            <li>
+              <strong>Positions:</strong> You find a counterparty who takes the opposite side of your prediction. Once
+              matched, new tokens are minted for both parties. This step must occur first; otherwise, no tokens would be
+              available for trading. tokens are minted for both parties. This step must occur first; otherwise, no
+              tokens would be available for trading.
+            </li>
+            <li>
+              <strong>Offers:</strong> You directly buy or sell existing tokens from other users. After tokens have been
+              minted through positions, users can freely trade these tokens with each other.
+            </li>
+          </ul>
+        </div>
+
+        <div className="bg-base-200 p-4 rounded-lg">
+          <h3 className="font-bold mb-2">How to use:</h3>
           <ol className="list-decimal list-inside space-y-2">
             <li>
-              There are two ways to participate in the prediction market: Through positions, where you find a
-              counterparty who takes the opposite side of your prediction. When matched, new tokens are created for both
-              parties. The other option is through offers, where you can directly buy or sell existing tokens from other
-              users.
+              To mint new trading tokens, visit the{" "}
+              <a href="/positions-overview" className="text-primary hover:underline">
+                positions overview tab
+              </a>{" "}
+              and create a position by choosing your predicted outcome (Yes/No) and the amount you&apos;d like to
+              invest. This will lead to a minting of new tokens and increase the total token supply for both tokens.
             </li>
             <li>
-              To create new trading tokens you can go to the positions overview tab and create a new position by
-              selecting your expected outcome (Yes/No) and the amount you want to invest. This increases the overall
-              token supply.
+              If you already own tokens (e.g. from the step before), you can sell them or explore existing offers from
+              other users in the{" "}
+              <a href="/offers-overview" className="text-primary hover:underline">
+                offers overview tab
+              </a>
+              . Trading existing tokens does not change the overall token supply—it simply transfers tokens between
+              users. But you could also create a ask for a token and wait for a buyer to sell them to you (therefor you
+              dont need to have tokens).
             </li>
             <li>
-              If you have tokens you can sell them in the offer overview tab or also watch out for possible offers for
-              tokens. This has no impact on the overall token supply, since tokens just changes hands.
+              If you control the oracle address, you can resolve the prediction market and finalize outcomes, so that
+              people can redeem the winning tokens.
             </li>
-            <li>If you control the oracle address you can resolve the prediction market</li>
           </ol>
         </div>
 
@@ -50,7 +76,7 @@ export function PredictionMarketExplanation() {
           <ul className="list-disc list-inside space-y-1">
             <li>Real order-book functionality with sorting and caculate probability</li>
             <li>Reduce Supply of tokens via burning</li>
-            <li>Real racle Integration</li>
+            <li>Real oracle integration</li>
             <li>Redeem winning token after resolution</li>
             <li>No fee/revenue accural for the prediction market</li>
           </ul>

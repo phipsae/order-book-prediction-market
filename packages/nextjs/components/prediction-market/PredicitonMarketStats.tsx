@@ -59,17 +59,19 @@ export function PredicitonMarketStats() {
 
       {/* Contract ETH Balance */}
       <div className="bg-base-200 p-4 rounded-lg mb-4">
-        <h3 className="font-bold text-lg text-primary">Contract Balance</h3>
+        <h3 className="font-bold text-lg text-primary">Contract Prediction Market Info</h3>
         <div className="divider my-2"></div>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span>Total ETH Balance:</span>
+            <span>Total ETH Balance (to get distributed to the winning token holders):</span>
             <span className="font-medium">
-              {contractBalance ? `${formatEther(contractBalance.value)} ${contractBalance.symbol}` : "Loading..."}
+              {contractBalance
+                ? `${Number(formatEther(contractBalance.value)).toFixed(4)} ${contractBalance.symbol}`
+                : "Loading..."}
             </span>
           </div>
           <div className="flex justify-between">
-            <span> ETH Value of Token in case of winning:</span>
+            <span> ETH Value of Yes/No Token in case of winning:</span>
             <span className="font-medium">{tokenValue ? `${formatEther(tokenValue)} ETH` : "Loading..."}</span>
           </div>
           <div className="flex justify-between">
@@ -84,12 +86,14 @@ export function PredicitonMarketStats() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* YES Token Info */}
         <div className="bg-base-200 p-4 rounded-lg">
-          <h3 className="font-bold text-lg text-success">YES Token</h3>
+          <h3 className="font-bold text-lg text-success">&quot;Yes&quot; Token</h3>
           <div className="divider my-2"></div>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span>Total Supply:</span>
-              <span className="font-medium">{yesTotalSupply ? formatEther(yesTotalSupply) : "0"} tokens</span>
+              <span className="font-medium">
+                {yesTotalSupply ? Number(formatEther(yesTotalSupply)).toFixed(4) : "0"} tokens
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Token Address:</span>
@@ -102,12 +106,14 @@ export function PredicitonMarketStats() {
 
         {/* NO Token Info */}
         <div className="bg-base-200 p-4 rounded-lg">
-          <h3 className="font-bold text-lg text-error">NO Token</h3>
+          <h3 className="font-bold text-lg text-error">&quot;No&quot; Token</h3>
           <div className="divider my-2"></div>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span>Total Supply:</span>
-              <span className="font-medium">{noTotalSupply ? formatEther(noTotalSupply) : "0"} tokens</span>
+              <span className="font-medium">
+                {noTotalSupply ? Number(formatEther(noTotalSupply)).toFixed(4) : "0"} tokens
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Token Address:</span>
