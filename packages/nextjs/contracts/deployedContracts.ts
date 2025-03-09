@@ -1080,7 +1080,7 @@ const deployedContracts = {
   },
   11155111: {
     PredictionMarketOrderBook: {
-      address: "0xbad8f48a8fc094fa6c3fe01b07e6f2cc7e754ddf",
+      address: "0xe254a34478c5b2e6c7edf33e25994fda2b7d7b20",
       abi: [
         {
           type: "constructor",
@@ -2147,7 +2147,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deploymentFile: "run-1741435777.json",
+      deploymentFile: "run-1741531417.json",
       deploymentScript: "Deploy.s.sol",
     },
   },
