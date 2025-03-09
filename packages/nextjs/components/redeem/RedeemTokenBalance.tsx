@@ -55,10 +55,10 @@ export function RedeemTokenBalance({
           <h3 className="text-lg text-center font-medium flex flex-col gap-1">
             <div>
               My Token Balance of &quot;{option}&quot;:{" "}
-              <span className="text-gray-700">{balance ? formatEther(balance) : "0"} tokens</span>
+              <span className="text-gray-700">{balance ? Number(formatEther(balance)).toFixed(4) : "0"} tokens</span>
             </div>
             <div className="text-gray-700 text-sm">
-              ({tokenBalanceValue ? formatEther(tokenBalanceValue) : "0"}{" "}
+              ({tokenBalanceValue ? Number(formatEther(tokenBalanceValue)).toFixed(4) : "0"}{" "}
               {redeem ? "ETH worth" : "ETH worth in case of win"})
             </div>
           </h3>

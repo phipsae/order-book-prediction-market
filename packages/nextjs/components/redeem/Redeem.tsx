@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { parseEther } from "viem";
+import { formatEther, parseEther } from "viem";
+import { useAccount, useReadContract } from "wagmi";
+import { erc20Abi } from "~~/components/constants";
 import { RedeemTokenBalance } from "~~/components/redeem/RedeemTokenBalance";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 export function Redeem() {
-  const [amount, setAmount] = useState<bigint>(BigInt(0));
-  const tokenAmount = parseEther((amount || BigInt(0)).toString());
+  const [amountStr, setAmountStr] = useState<string>("");
+  const tokenAmount = amountStr ? parseEther(amountStr) : BigInt(0);
+  const { address } = useAccount();
 
   const { data: prediction, isLoading } = useScaffoldReadContract({
     contractName: "PredictionMarketOrderBook",
@@ -16,6 +19,20 @@ export function Redeem() {
 
   const { writeContractAsync } = useScaffoldWriteContract({
     contractName: "PredictionMarketOrderBook",
+  });
+
+  const predictionOutcome1 = prediction?.[1];
+  const predictionOutcome2 = prediction?.[2];
+  const isReported = prediction?.[7];
+  const optionToken1 = prediction?.[8];
+  const winningToken = prediction?.[11];
+  const tokenAddress = winningToken === optionToken1 ? prediction?.[8] : prediction?.[9];
+
+  const { data: balance } = useReadContract({
+    abi: erc20Abi,
+    address: tokenAddress as `0x${string}`,
+    functionName: "balanceOf",
+    args: [address ?? "0x0"],
   });
 
   if (isLoading)
@@ -47,12 +64,6 @@ export function Redeem() {
   // address predictionMarketOwner,
   // address winningToken
 
-  const predictionOutcome1 = prediction[1];
-  const predictionOutcome2 = prediction[2];
-  const isReported = prediction[7];
-  const optionToken1 = prediction[8];
-  const winningToken = prediction[11];
-  const tokenAddress = winningToken === optionToken1 ? prediction[8] : prediction[9];
   const winningOption = winningToken === optionToken1 ? predictionOutcome1 : predictionOutcome2;
 
   const handleRedeem = async () => {
@@ -65,7 +76,12 @@ export function Redeem() {
       console.error("Error redeeming tokens:", error);
     }
   };
-  console.log(winningToken);
+
+  const handleMaxAmount = () => {
+    if (balance) {
+      setAmountStr(formatEther(balance));
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-base-100 rounded-xl shadow-lg">
@@ -75,12 +91,26 @@ export function Redeem() {
       )}
 
       <div className="flex gap-4">
-        <input
-          type="number"
-          placeholder="Amount to redeem"
-          className="input input-bordered flex-1"
-          onChange={e => setAmount(BigInt(e.target.value))}
-        />
+        <div className="flex-1 relative">
+          <input
+            type="text"
+            placeholder="Amount to redeem"
+            className="input input-bordered w-full pr-16"
+            onChange={e => {
+              // Allow decimal input by storing as string
+              if (e.target.value === "" || /^\d*\.?\d*$/.test(e.target.value)) {
+                setAmountStr(e.target.value);
+              }
+            }}
+            value={amountStr}
+          />
+          <button
+            className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-secondary"
+            onClick={handleMaxAmount}
+          >
+            MAX
+          </button>
+        </div>
         <button className="btn btn-primary" onClick={handleRedeem}>
           Redeem Tokens
         </button>
