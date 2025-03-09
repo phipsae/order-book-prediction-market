@@ -16,14 +16,14 @@ export function TokenBalance() {
     functionName: "prediction",
   });
 
-  const { data: balanceYesToken, queryKey } = useReadContract({
+  const { data: balanceYesToken, queryKey: yesTokenQueryKey } = useReadContract({
     abi: erc20Abi,
     address: prediction?.[8],
     functionName: "balanceOf",
     args: [address ?? "0x0"],
   });
 
-  const { data: balanceNoToken } = useReadContract({
+  const { data: balanceNoToken, queryKey: noTokenQueryKey } = useReadContract({
     abi: erc20Abi,
     address: prediction?.[9],
     functionName: "balanceOf",
@@ -48,7 +48,12 @@ export function TokenBalance() {
     balanceNoToken && tokenValue ? (balanceNoToken * tokenValue) / BigInt(10n ** 18n) : 0n;
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey });
+    if (yesTokenQueryKey) {
+      queryClient.invalidateQueries({ queryKey: yesTokenQueryKey });
+    }
+    if (noTokenQueryKey) {
+      queryClient.invalidateQueries({ queryKey: noTokenQueryKey });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockNumber]);
 
