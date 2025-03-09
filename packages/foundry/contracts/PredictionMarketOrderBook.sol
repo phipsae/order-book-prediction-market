@@ -373,7 +373,7 @@ contract PredictionMarketOrderBook is Ownable {
             revert PredictionMarketOrderBook__PredictionNotResolved();
         }
 
-        if (s_winningToken.balanceOf(msg.sender) <= _amount) {
+        if (s_winningToken.balanceOf(msg.sender) < _amount) {
             revert PredictionMarketOrderBook__InsufficientWinningTokens();
         }
 

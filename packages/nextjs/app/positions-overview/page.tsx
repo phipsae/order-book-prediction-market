@@ -1,11 +1,23 @@
+"use client";
+
 import type { NextPage } from "next";
 import { TokenBalance } from "~~/components/offers/TokenBalance";
 import { CreatePosition } from "~~/components/positions/CreatePosition";
 import { PositionView } from "~~/components/positions/PositionView";
 import { PositionsOverviewExplanation } from "~~/components/positions/PositionsOverviewExplanation";
 import { PredictionMarketInfo } from "~~/components/prediction-market/PredictionMarketInfo";
+import { Redeem } from "~~/components/redeem/Redeem";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
 const PositionsOverview: NextPage = () => {
+  const { data: prediction } = useScaffoldReadContract({
+    contractName: "PredictionMarketOrderBook",
+    functionName: "prediction",
+  });
+
+  if (!prediction) return <div>No prediction found...</div>;
+
+  const isReported = prediction[7];
   return (
     <>
       <div className="flex items-center flex-col flex-grow pt-10">
@@ -26,14 +38,18 @@ const PositionsOverview: NextPage = () => {
                   <TokenBalance />
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="w-1/3">
-                  <CreatePosition />
+              {!isReported ? (
+                <div className="flex gap-4">
+                  <div className="w-1/3">
+                    <CreatePosition />
+                  </div>
+                  <div className="w-2/3">
+                    <PositionView />
+                  </div>
                 </div>
-                <div className="w-2/3">
-                  <PositionView />
-                </div>
-              </div>
+              ) : (
+                <Redeem />
+              )}
             </div>
             <div className="flex-1 min-w-[300px] max-w-[450px]">
               <PositionsOverviewExplanation />

@@ -44,7 +44,7 @@ export function PredictionMarketInfo() {
   const isReported = prediction[7];
   const yesTokenAddress = prediction[8];
   const noTokenAddress = prediction[9];
-  const winningToken = prediction[10];
+  const winningToken = prediction[11];
   const winningOption = winningToken === yesTokenAddress ? predictionOutcome1 : predictionOutcome2;
 
   return (
@@ -54,8 +54,8 @@ export function PredictionMarketInfo() {
           <div>
             <p className="text-base-content text-xl font-bold text-center">{question}</p>
             <div className="flex justify-center mt-2">
-              <div className={`badge ${isReported ? "badge-success" : "badge-warning"}`}>
-                {isReported ? "Reported" : "In Progress"}
+              <div className={`badge badge-lg px-4 py-3 text-sm ${isReported ? "badge-success" : "badge-warning"}`}>
+                {isReported ? `Reported: ${winningOption}` : "In Progress"}
               </div>
             </div>
           </div>
