@@ -167,6 +167,7 @@ contract PredictionMarketOrderBook is Ownable {
 
     function takePosition(uint256 _positionId) external payable {
         require(_positionId < positions.length, "Position does not exist");
+        require(!s_isReported, "Prediction already resolved");
         Position storage position = positions[_positionId];
         require(position.isActive, "Position is not active");
         require(msg.value == position.matchingETHAmount, "Must match position amount");
@@ -232,6 +233,7 @@ contract PredictionMarketOrderBook is Ownable {
     function takeSellOffer(uint256 _offerId) external payable {
         require(_offerId < offers.length, "Offer does not exist");
         require(msg.value > 0, "Must send ETH to take offer");
+        require(!s_isReported, "Prediction already resolved");
         Offer storage offer = offers[_offerId];
         require(offer.isActive, "Offer is not active");
         /// calculate token amount to be taken
@@ -302,6 +304,7 @@ contract PredictionMarketOrderBook is Ownable {
         require(_offerId < offers.length, "Offer does not exist");
         Offer storage offer = offers[_offerId];
         require(offer.isActive, "Offer is not active");
+        require(!s_isReported, "Prediction already resolved");
         require(offer.isBuyOffer, "Offer is not a buy offer");
         require(_tokenAmount <= offer.outstandingTokenAmount, "Insufficient outstanding token amount");
         offer.outstandingTokenAmount -= _tokenAmount;

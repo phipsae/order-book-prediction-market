@@ -19,11 +19,17 @@ export const PositionCard = ({ positionId, isActive, userAddress }: PositionCard
     args: [BigInt(positionId)],
   });
 
+  const { data: prediction } = useScaffoldReadContract({
+    contractName: "PredictionMarketOrderBook",
+    functionName: "prediction",
+  });
+
   if (isLoading) return <div>Loading...</div>;
   if (!position) return <div>No positions found...</div>;
   if (isActive !== position[6]) return null;
   const isCreator = position[1] === userAddress ? true : false;
   const isYes = position[7] === 0 ? true : false;
+  const isPredictionReported = prediction?.[7] || false;
 
   return (
     <div
@@ -63,7 +69,9 @@ export const PositionCard = ({ positionId, isActive, userAddress }: PositionCard
         <div className={`badge badge-sm ${position[6] ? "badge-success" : "badge-error"}`}>
           {position[6] ? "Active" : "Inactive"}
         </div>
-        <TakePosition positionId={positionId} ethToMatch={position[4]} isActive={position[6]} />
+        {!isPredictionReported && (
+          <TakePosition positionId={positionId} ethToMatch={position[4]} isActive={position[6]} />
+        )}
         <ClosePosition positionId={positionId} isActive={position[6]} isCreator={isCreator} />
       </div>
     </div>

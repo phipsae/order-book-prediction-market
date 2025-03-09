@@ -47,6 +47,13 @@ export function PredictionMarketInfo() {
   const winningToken = prediction[11];
   const winningOption = winningToken === yesTokenAddress ? predictionOutcome1 : predictionOutcome2;
 
+  // Determine badge color based on the winning option
+  const badgeColor = isReported
+    ? winningToken === yesTokenAddress
+      ? "badge-success"
+      : "badge-error"
+    : "badge-warning";
+
   return (
     <div className="bg-base-100 p-6 rounded-lg shadow-lg max-w-2xl mx-auto flex-grow h-full">
       <div className="bg-base-200 p-4 rounded-lg h-full border border-base-300">
@@ -54,7 +61,7 @@ export function PredictionMarketInfo() {
           <div>
             <p className="text-base-content text-xl font-bold text-center">{question}</p>
             <div className="flex justify-center mt-2">
-              <div className={`badge badge-lg px-4 py-3 text-sm ${isReported ? "badge-success" : "badge-warning"}`}>
+              <div className={`badge badge-lg px-4 py-3 text-sm ${badgeColor}`}>
                 {isReported ? `Reported: ${winningOption}` : "In Progress"}
               </div>
             </div>

@@ -35,6 +35,7 @@ export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer, isYes }:
   const result = Number(offer[8]) === 0 ? true : false;
   if (isYes !== result) return null;
   const isCreator = offer[1] === userAddress ? true : false;
+  const isPredictionResolved = prediction[7] || false; // Check if prediction is reported/resolved
 
   //   struct Offer {
   //     uint256 id;
@@ -87,13 +88,15 @@ export const OfferCard = ({ offerId, isActive, userAddress, isBuyOffer, isYes }:
         <div className={`badge badge-sm ${offer[4] ? "badge-success" : "badge-error"}`}>
           {offer[4] ? "Active" : "Closed"}
         </div>
-        <TakeOffer
-          offerId={offerId}
-          ethAmount={ethAmount}
-          isActive={offer[5]}
-          isBuyOffer={isBuyOffer}
-          tokenAmount={tokenAmount}
-        />
+        {!isPredictionResolved && (
+          <TakeOffer
+            offerId={offerId}
+            ethAmount={ethAmount}
+            isActive={offer[5]}
+            isBuyOffer={isBuyOffer}
+            tokenAmount={tokenAmount}
+          />
+        )}
         <CloseOffer offerId={offerId} isActive={offer[5]} isCreator={isCreator} isBuyOffer={isBuyOffer} />
       </div>
     </div>

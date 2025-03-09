@@ -112,7 +112,7 @@ export function Redeem() {
           </button>
         </div>
         <button className="btn btn-primary" onClick={handleRedeem}>
-          Redeem Tokens
+          Redeem
         </button>
       </div>
     </div>

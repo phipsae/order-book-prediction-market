@@ -38,18 +38,12 @@ const OfferOverview: NextPage = () => {
                   <TokenBalance />
                 </div>
               </div>
-              {!isReported ? (
-                <div className="flex gap-4">
-                  <div className="w-1/3">
-                    <CreateOffer />
-                  </div>
-                  <div className="w-2/3">
-                    <OfferTabs />
-                  </div>
+              <div className="flex gap-4">
+                <div className="w-1/3">{isReported ? <Redeem /> : <CreateOffer />}</div>
+                <div className="w-2/3">
+                  <OfferTabs />
                 </div>
-              ) : (
-                <Redeem />
-              )}
+              </div>
             </div>
 
             <div className="w-1/3 min-w-[300px] max-w-[450px]">

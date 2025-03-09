@@ -38,18 +38,12 @@ const PositionsOverview: NextPage = () => {
                   <TokenBalance />
                 </div>
               </div>
-              {!isReported ? (
-                <div className="flex gap-4">
-                  <div className="w-1/3">
-                    <CreatePosition />
-                  </div>
-                  <div className="w-2/3">
-                    <PositionView />
-                  </div>
+              <div className="flex gap-4">
+                <div className="w-1/3">{!isReported ? <CreatePosition /> : <Redeem />}</div>
+                <div className="w-2/3">
+                  <PositionView />
                 </div>
-              ) : (
-                <Redeem />
-              )}
+              </div>
             </div>
             <div className="flex-1 min-w-[300px] max-w-[450px]">
               <PositionsOverviewExplanation />
